@@ -1,11 +1,31 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   Shield, AlertTriangle, Clock, CheckCircle2, ArrowRight,
   Zap, Lock, FileCheck, Mic, Github, Globe, Database,
-  ChevronDown, X, Sparkles, TrendingUp, Play
+  ChevronDown, X, Sparkles, TrendingUp, Play, Server, Users, Check
 } from 'lucide-react'
+
+// Scroll Progress Hook
+function useScrollProgress() {
+  const [progress, setProgress] = useState(0)
+
+  useEffect(() => {
+    const updateProgress = () => {
+      const scrollTop = window.scrollY
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight
+      const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0
+      setProgress(scrollPercent)
+    }
+
+    window.addEventListener('scroll', updateProgress)
+    return () => window.removeEventListener('scroll', updateProgress)
+  }, [])
+
+  return progress
+}
 
 // Horror stories / stats
 const horrorStats = [
@@ -88,11 +108,72 @@ const testimonialPlaceholders = [
   },
 ]
 
+const pricingPlans = [
+  {
+    name: 'Founder',
+    price: 'Free',
+    priceDetail: 'Forever',
+    description: 'Perfect for solo founders and early-stage startups',
+    infrastructure: 'Multi-tenant shared infrastructure',
+    infrastructureIcon: Users,
+    cta: 'Get Started Free',
+    ctaLink: '/signup',
+    popular: false,
+    features: [
+      'AI-powered IP discovery',
+      'Voice-guided onboarding',
+      'IP protection checklist',
+      'Evidence capture from GitHub',
+      'Trademark monitoring',
+      'Patent deadline tracking',
+      'Shared Supabase (row-level security)',
+      'Shared Vercel hosting',
+    ],
+    notIncluded: [
+      'Dedicated infrastructure',
+      'Complete data isolation',
+      'Custom domain',
+    ],
+  },
+  {
+    name: 'Pro',
+    price: '$30',
+    priceDetail: 'per month',
+    description: 'For founders who need complete data isolation',
+    infrastructure: 'Dedicated segregated infrastructure',
+    infrastructureIcon: Server,
+    cta: 'Upgrade to Pro',
+    ctaLink: '/signup?plan=pro',
+    popular: true,
+    features: [
+      'Everything in Founder, plus:',
+      'Your own Supabase instance',
+      'Your own Vercel deployment',
+      'Complete data isolation',
+      'Physical infrastructure separation',
+      'Dedicated backup policy',
+      'Custom domain support',
+      'Priority support',
+    ],
+    notIncluded: [],
+  },
+]
+
 export default function LandingPage() {
+  const scrollProgress = useScrollProgress()
+
   return (
     <div className="min-h-screen bg-slate-950 text-white">
+      {/* Scroll Progress Bar */}
+      <div className="fixed top-0 left-0 right-0 h-1 bg-slate-800 z-[60]">
+        <div
+          className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 transition-all duration-150"
+          style={{ width: `${scrollProgress}%` }}
+        />
+      </div>
+
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-lg border-b border-white/10">
+      <nav className="fixed top-1 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-lg border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
@@ -105,6 +186,7 @@ export default function LandingPage() {
               <a href="#problem" className="text-sm text-gray-400 hover:text-white transition-colors">The Problem</a>
               <a href="#solution" className="text-sm text-gray-400 hover:text-white transition-colors">Solution</a>
               <a href="#features" className="text-sm text-gray-400 hover:text-white transition-colors">Features</a>
+              <a href="#pricing" className="text-sm text-gray-400 hover:text-white transition-colors">Pricing</a>
               <Link
                 href="/login"
                 className="text-sm text-gray-300 hover:text-white transition-colors"
@@ -151,7 +233,7 @@ export default function LandingPage() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-300 text-sm mb-8">
               <Sparkles className="w-4 h-4" />
-              <span>100% Free for Founders</span>
+              <span>Free for Founders • Pro for $30/mo</span>
             </div>
 
             {/* Headline */}
@@ -173,15 +255,14 @@ export default function LandingPage() {
                 href="/signup"
                 className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 text-lg"
               >
-                Start Protecting Your IP
+                Start Protecting Your IP — Free
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <a
-                href="#solution"
+                href="#pricing"
                 className="w-full sm:w-auto px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
               >
-                <Play className="w-5 h-5" />
-                See How It Works
+                View Pricing
               </a>
             </div>
 
@@ -193,7 +274,7 @@ export default function LandingPage() {
               </div>
               <div className="flex items-center gap-2">
                 <Lock className="w-4 h-4" />
-                <span>Bank-level encryption</span>
+                <span>Enterprise-grade security</span>
               </div>
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4" />
@@ -344,8 +425,109 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section id="pricing" className="py-24 bg-gradient-to-b from-slate-900/50 to-slate-950">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+              Simple, Transparent <span className="text-gradient">Pricing</span>
+            </h2>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              Start free with enterprise-grade security. Upgrade for dedicated infrastructure
+              and complete data isolation.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {pricingPlans.map((plan) => (
+              <div
+                key={plan.name}
+                className={`relative rounded-2xl p-8 ${
+                  plan.popular 
+                    ? 'bg-gradient-to-b from-violet-500/20 to-indigo-500/10 border-2 border-violet-500/50' 
+                    : 'bg-white/5 border border-white/10'
+                }`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <span className="px-4 py-1 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-full text-sm font-medium">
+                      Dedicated Infrastructure
+                    </span>
+                  </div>
+                )}
+
+                <div className="mb-6">
+                  <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                  <div className="flex items-baseline gap-2 mb-2">
+                    <span className="text-4xl font-bold">{plan.price}</span>
+                    <span className="text-gray-400">{plan.priceDetail}</span>
+                  </div>
+                  <p className="text-gray-400 text-sm">{plan.description}</p>
+                </div>
+
+                {/* Infrastructure badge */}
+                <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm mb-6 ${
+                  plan.popular 
+                    ? 'bg-violet-500/20 text-violet-300' 
+                    : 'bg-white/10 text-gray-300'
+                }`}>
+                  <plan.infrastructureIcon className="w-4 h-4" />
+                  {plan.infrastructure}
+                </div>
+
+                {/* Features */}
+                <ul className="space-y-3 mb-8">
+                  {plan.features.map((feature, i) => (
+                    <li key={i} className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                      <span className="text-gray-300">{feature}</span>
+                    </li>
+                  ))}
+                  {plan.notIncluded.map((feature, i) => (
+                    <li key={i} className="flex items-center gap-3">
+                      <X className="w-5 h-5 text-gray-600 flex-shrink-0" />
+                      <span className="text-gray-600">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* CTA */}
+                <Link
+                  href={plan.ctaLink}
+                  className={`w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${
+                    plan.popular 
+                      ? 'bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white' 
+                      : 'bg-white/10 hover:bg-white/20 text-white'
+                  }`}
+                >
+                  {plan.cta}
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          {/* Security note */}
+          <div className="mt-12 text-center">
+            <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/5 border border-white/10 rounded-xl">
+              <Lock className="w-5 h-5 text-violet-400" />
+              <span className="text-gray-400">
+                <strong className="text-white">Enterprise-grade security on both plans.</strong>{' '}
+                AES-256 encryption, SOC 2 compliant, row-level security.
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-6 text-center">
+            <Link href="/pricing" className="text-violet-400 hover:text-violet-300 text-sm">
+              Compare plans in detail →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials */}
-      <section className="py-24 bg-slate-900/50">
+      <section className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Founders Who Avoided Disaster</h2>
@@ -365,7 +547,7 @@ export default function LandingPage() {
       </section>
 
       {/* Investor Value Section */}
-      <section className="py-24">
+      <section className="py-24 bg-slate-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -445,19 +627,28 @@ export default function LandingPage() {
             Don't Let Your Hard Work <span className="text-red-400">Become Someone Else's</span>
           </h2>
           <p className="text-xl text-gray-400 mb-10">
-            Join thousands of founders who are protecting their ideas with LaunchReady. It's free to get started.
+            Join thousands of founders who are protecting their ideas with LaunchReady.
+            Start free, upgrade when you need dedicated infrastructure.
           </p>
 
-          <Link
-            href="/signup"
-            className="inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl font-semibold transition-all text-xl"
-          >
-            Start Protecting Your IP — Free
-            <ArrowRight className="w-6 h-6" />
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/signup"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl font-semibold transition-all text-xl"
+            >
+              Start Free
+              <ArrowRight className="w-6 h-6" />
+            </Link>
+            <Link
+              href="/signup?plan=pro"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-semibold transition-all"
+            >
+              Start with Pro — $30/mo
+            </Link>
+          </div>
 
           <p className="mt-6 text-sm text-gray-500">
-            No credit card required. Set up in under 5 minutes.
+            No credit card required for free plan. Cancel Pro anytime.
           </p>
         </div>
       </section>
@@ -473,6 +664,7 @@ export default function LandingPage() {
               <span className="text-lg font-bold">LaunchReady</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-gray-500">
+              <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
               <a href="#" className="hover:text-white transition-colors">Privacy</a>
               <a href="#" className="hover:text-white transition-colors">Terms</a>
               <a href="mailto:hello@launchready.io" className="hover:text-white transition-colors">Contact</a>
