@@ -5,10 +5,30 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   Shield, Check, X, ArrowRight, Sparkles,
-  Server, Database, Lock, Users, Zap, Building2
+  Server, Database, Lock, Users, Building2
 } from 'lucide-react'
 
-const plans = [
+interface PlanFeature {
+  text: string
+  included: boolean
+  note?: string
+  highlight?: boolean
+}
+
+interface Plan {
+  name: string
+  price: string
+  priceDetail: string
+  description: string
+  infrastructure: string
+  cta: string
+  ctaLink: string
+  popular: boolean
+  priceId?: string
+  features: PlanFeature[]
+}
+
+const plans: Plan[] = [
   {
     name: 'Founder',
     price: 'Free',
@@ -105,14 +125,12 @@ export default function PricingPage() {
 
       if (data.error) {
         if (response.status === 401) {
-          // Not logged in, redirect to signup with plan
           router.push('/signup?plan=pro')
           return
         }
         throw new Error(data.error)
       }
 
-      // Redirect to Stripe Checkout
       window.location.href = data.url
     } catch (error) {
       console.error('Subscription error:', error)
