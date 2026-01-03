@@ -3,13 +3,7 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-12-15.clover',
-})
-
-const PRICES = {
-  pro_monthly: process.env.STRIPE_PRO_MONTHLY_PRICE_ID!,
-}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,9 +21,9 @@ export async function POST(request: NextRequest) {
 
     const { priceId } = await request.json()
 
-    if (!priceId || !Object.values(PRICES).includes(priceId)) {
+    if (!priceId) {
       return NextResponse.json(
-        { error: 'Invalid price selected' },
+        { error: 'Price ID is required' },
         { status: 400 }
       )
     }

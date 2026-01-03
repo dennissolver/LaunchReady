@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-12-15.clover',
-})
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 // Use service role for webhook (no user session)
 const supabase = createClient(
@@ -39,19 +37,21 @@ export async function POST(request: NextRequest) {
         const userId = session.metadata?.supabase_user_id
 
         if (userId && session.subscription) {
-          // Get subscription details
           const subscription = await stripe.subscriptions.retrieve(
             session.subscription as string
           )
 
-          // Update user's plan to pro
+          // Access current_period_end safely
+          const subData = subscription as unknown as { current_period_end?: number }
+          const periodEnd = subData.current_period_end
+
           await supabase
             .from('profiles')
             .update({
               plan: 'pro',
               stripe_subscription_id: subscription.id,
               stripe_subscription_status: subscription.status,
-              stripe_current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+              stripe_current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
             })
             .eq('id', userId)
 
@@ -67,12 +67,16 @@ export async function POST(request: NextRequest) {
         if (userId) {
           const plan = subscription.status === 'active' ? 'pro' : 'free'
 
+          // Access current_period_end safely
+          const subData = subscription as unknown as { current_period_end?: number }
+          const periodEnd = subData.current_period_end
+
           await supabase
             .from('profiles')
             .update({
               plan,
               stripe_subscription_status: subscription.status,
-              stripe_current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+              stripe_current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
             })
             .eq('id', userId)
 
@@ -86,7 +90,6 @@ export async function POST(request: NextRequest) {
         const userId = subscription.metadata?.supabase_user_id
 
         if (userId) {
-          // Downgrade to free
           await supabase
             .from('profiles')
             .update({
