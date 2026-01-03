@@ -41,7 +41,6 @@ export async function POST(request: NextRequest) {
             session.subscription as string
           )
 
-          // Access current_period_end safely
           const subData = subscription as unknown as { current_period_end?: number }
           const periodEnd = subData.current_period_end
 
@@ -67,7 +66,6 @@ export async function POST(request: NextRequest) {
         if (userId) {
           const plan = subscription.status === 'active' ? 'pro' : 'free'
 
-          // Access current_period_end safely
           const subData = subscription as unknown as { current_period_end?: number }
           const periodEnd = subData.current_period_end
 
@@ -105,8 +103,8 @@ export async function POST(request: NextRequest) {
       }
 
       case 'invoice.payment_failed': {
-        const invoice = event.data.object as Stripe.Invoice
-        const subscriptionId = invoice.subscription as string
+        const invoice = event.data.object as unknown as { subscription?: string }
+        const subscriptionId = invoice.subscription
 
         if (subscriptionId) {
           const subscription = await stripe.subscriptions.retrieve(subscriptionId)
