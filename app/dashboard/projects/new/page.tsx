@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Link from 'next/link'
-import { 
+import {
   ArrowLeft, ArrowRight, Loader2, Mic, Shield,
-  Lightbulb, Hammer, Rocket, Building2
+  Lightbulb, Hammer, Rocket, Building2, Globe, Sparkles, RefreshCw, Check
 } from 'lucide-react'
 
 const projectStages = [
@@ -19,16 +19,56 @@ const projectStages = [
 export default function NewProjectPage() {
   const router = useRouter()
   const supabase = createClientComponentClient()
-  
+
   const [step, setStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
+  const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  
+  const [aiGenerated, setAiGenerated] = useState(false)
+
   // Form state
   const [name, setName] = useState('')
+  const [domain, setDomain] = useState('')
   const [status, setStatus] = useState('')
   const [description, setDescription] = useState('')
   const [problemStatement, setProblemStatement] = useState('')
+
+  const generateDescription = async () => {
+    if (!domain.trim()) return
+
+    setIsGenerating(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/describe-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: domain }),
+      })
+
+      const data = await response.json()
+
+      if (data.error) {
+        throw new Error(data.error)
+      }
+
+      if (data.description) {
+        setDescription(data.description)
+        setAiGenerated(true)
+      }
+    } catch (err) {
+      console.error('Failed to generate description:', err)
+      // Don't show error to user, just let them write manually
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const handleDomainBlur = () => {
+    if (domain.trim() && !description.trim()) {
+      generateDescription()
+    }
+  }
 
   const handleSubmit = async () => {
     if (!name || !status) {
@@ -41,7 +81,7 @@ export default function NewProjectPage() {
 
     try {
       const { data: { session } } = await supabase.auth.getSession()
-      
+
       if (!session) {
         throw new Error('Not authenticated')
       }
@@ -60,6 +100,20 @@ export default function NewProjectPage() {
 
       if (insertError) throw insertError
 
+      // If domain was provided, create a domain protection item
+      if (domain.trim()) {
+        const cleanDomain = domain.trim().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]
+        await supabase
+          .from('protection_items')
+          .insert({
+            project_id: data.id,
+            item_type: 'domain',
+            item_name: cleanDomain,
+            status: 'registered', // Assume it's registered since they have it
+            external_url: domain.startsWith('http') ? domain : `https://${domain}`,
+          })
+      }
+
       // Redirect to project page
       router.push(`/dashboard/projects/${data.id}`)
     } catch (err) {
@@ -72,7 +126,7 @@ export default function NewProjectPage() {
     <div className="max-w-2xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <Link 
+        <Link
           href="/dashboard"
           className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4"
         >
@@ -88,7 +142,7 @@ export default function NewProjectPage() {
       {/* Progress */}
       <div className="flex items-center gap-2 mb-8">
         {[1, 2, 3].map((s) => (
-          <div 
+          <div
             key={s}
             className={`h-1 flex-1 rounded-full transition-colors ${
               s <= step ? 'bg-violet-600' : 'bg-gray-200'
@@ -112,6 +166,41 @@ export default function NewProjectPage() {
                 placeholder="e.g., TourLingo, CloudDash, FitTrack"
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-gray-400" />
+                  Domain name
+                  <span className="text-xs text-gray-400 font-normal">(optional but recommended)</span>
+                </div>
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={domain}
+                  onChange={(e) => {
+                    setDomain(e.target.value)
+                    setAiGenerated(false)
+                  }}
+                  onBlur={handleDomainBlur}
+                  placeholder="e.g., myapp.com or https://myapp.com"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                />
+                {domain && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {isGenerating ? (
+                      <Loader2 className="w-5 h-5 text-violet-500 animate-spin" />
+                    ) : aiGenerated ? (
+                      <Check className="w-5 h-5 text-emerald-500" />
+                    ) : null}
+                  </div>
+                )}
+              </div>
+              <p className="mt-1.5 text-xs text-gray-500">
+                We'll analyze your site to auto-generate a description
+              </p>
             </div>
 
             <div>
@@ -151,16 +240,56 @@ export default function NewProjectPage() {
         {step === 2 && (
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Describe your project in a sentence or two
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="e.g., An app that provides real-time translation for tourists using AR glasses..."
-                rows={3}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none"
-              />
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Describe your project in a sentence or two
+                </label>
+                {domain && (
+                  <button
+                    type="button"
+                    onClick={generateDescription}
+                    disabled={isGenerating}
+                    className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-500 font-medium disabled:opacity-50"
+                  >
+                    {isGenerating ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <RefreshCw className="w-3 h-3" />
+                    )}
+                    {isGenerating ? 'Generating...' : 'Regenerate with AI'}
+                  </button>
+                )}
+              </div>
+              <div className="relative">
+                <textarea
+                  value={description}
+                  onChange={(e) => {
+                    setDescription(e.target.value)
+                    setAiGenerated(false)
+                  }}
+                  placeholder="e.g., An app that provides real-time translation for tourists using AR glasses..."
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none"
+                />
+                {aiGenerated && description && (
+                  <div className="absolute top-2 right-2">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-violet-100 text-violet-700 text-xs rounded-full">
+                      <Sparkles className="w-3 h-3" />
+                      AI generated
+                    </span>
+                  </div>
+                )}
+              </div>
+              {!description && domain && !isGenerating && (
+                <button
+                  type="button"
+                  onClick={generateDescription}
+                  className="mt-2 flex items-center gap-2 text-sm text-violet-600 hover:text-violet-500"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Generate description from {domain.replace(/^https?:\/\//, '').split('/')[0]}
+                </button>
+              )}
             </div>
 
             <div>
@@ -187,9 +316,19 @@ export default function NewProjectPage() {
               Ready to protect {name}
             </h2>
             <p className="text-gray-500 mb-6">
-              After creating your project, you can connect your development platforms 
+              After creating your project, you can connect your development platforms
               to automatically capture evidence, or talk to our AI to discover your IP needs.
             </p>
+
+            {domain && (
+              <div className="bg-emerald-50 rounded-xl p-4 mb-4 flex items-center gap-3 text-left">
+                <Globe className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                <div>
+                  <p className="font-medium text-emerald-900">Domain will be added</p>
+                  <p className="text-sm text-emerald-700">{domain.replace(/^https?:\/\//, '').split('/')[0]}</p>
+                </div>
+              </div>
+            )}
 
             <div className="bg-violet-50 rounded-xl p-4 mb-6 flex items-start gap-3 text-left">
               <Mic className="w-5 h-5 text-violet-600 mt-0.5" />
