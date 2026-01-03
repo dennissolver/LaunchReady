@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { 
-  Shield, AlertTriangle, Clock, CheckCircle2, ArrowRight, 
+import {
+  Shield, AlertTriangle, Clock, CheckCircle2, ArrowRight,
   Zap, Lock, FileCheck, Mic, Github, Globe, Database,
   ChevronDown, X, Sparkles, TrendingUp, Play
 } from 'lucide-react'
@@ -78,13 +78,13 @@ const features = [
 const testimonialPlaceholders = [
   {
     quote: "I had no idea my first public deployment started a 12-month patent countdown. LaunchReady caught it with 47 days to spare.",
-    author: "Sarah Chen",
-    role: "Founder, TechFlow",
+    author: "Sarah",
+    role: "Founder",
   },
   {
     quote: "We discovered 3 contractors had never signed IP assignments. Could have killed our Series A.",
-    author: "Marcus Johnson", 
-    role: "CTO, DataSync",
+    author: "Marcus",
+    role: "CTO",
   },
 ]
 
@@ -105,13 +105,13 @@ export default function LandingPage() {
               <a href="#problem" className="text-sm text-gray-400 hover:text-white transition-colors">The Problem</a>
               <a href="#solution" className="text-sm text-gray-400 hover:text-white transition-colors">Solution</a>
               <a href="#features" className="text-sm text-gray-400 hover:text-white transition-colors">Features</a>
-              <Link 
+              <Link
                 href="/login"
                 className="text-sm text-gray-300 hover:text-white transition-colors"
               >
                 Log In
               </Link>
-              <Link 
+              <Link
                 href="/signup"
                 className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors"
               >
@@ -120,13 +120,13 @@ export default function LandingPage() {
             </div>
             {/* Mobile menu */}
             <div className="md:hidden flex items-center gap-3">
-              <Link 
+              <Link
                 href="/login"
                 className="text-sm text-gray-300"
               >
                 Log In
               </Link>
-              <Link 
+              <Link
                 href="/signup"
                 className="px-3 py-1.5 bg-violet-600 rounded-lg text-sm font-medium"
               >
@@ -142,10 +142,10 @@ export default function LandingPage() {
         {/* Background effects */}
         <div className="absolute inset-0 hero-gradient opacity-50" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-900/20 via-transparent to-transparent" />
-        
+
         {/* Animated grid */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f12_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f12_1px,transparent_1px)] bg-[size:64px_64px]" />
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
             {/* Badge */}
@@ -162,8 +162,8 @@ export default function LandingPage() {
 
             {/* Subheadline */}
             <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-10">
-              Most founders don't realise their IP is at risk until it's too late. 
-              LaunchReady uses AI to discover what you've built, capture evidence automatically, 
+              Most founders don't realise their IP is at risk until it's too late.
+              LaunchReady uses AI to discover what you've built, capture evidence automatically,
               and ensure every protection is in place.
             </p>
 
@@ -237,8 +237,8 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 gap-6">
             {dangerCards.map((card, i) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className={`p-6 rounded-2xl border card-hover ${
                   card.color === 'red' 
                     ? 'bg-red-500/5 border-red-500/20' 
@@ -278,7 +278,7 @@ export default function LandingPage() {
               Your AI-Powered <span className="text-gradient">IP Protection System</span>
             </h2>
             <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Think of it as Stripe Atlas for intellectual property. We guide you through protecting your ideas, 
+              Think of it as Stripe Atlas for intellectual property. We guide you through protecting your ideas,
               automate evidence capture, and prepare everything your lawyers need.
             </p>
           </div>
@@ -360,6 +360,80 @@ export default function LandingPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Investor Value Section */}
+      <section className="py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-300 text-sm mb-6">
+                <TrendingUp className="w-4 h-4" />
+                <span>Increase Your Valuation</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+                IP Protection Makes You <span className="text-gradient">More Investable</span>
+              </h2>
+              <p className="text-xl text-gray-400 mb-8">
+                Investors don't just look at your product — they look at your risk profile.
+                Unprotected IP is a red flag that can kill deals or slash valuations.
+              </p>
+              <div className="space-y-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white">Reduce Investor Risk</p>
+                    <p className="text-gray-400">Clear IP ownership means no surprise lawsuits post-investment. Investors can focus on growth, not legal battles.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white">Faster Due Diligence</p>
+                    <p className="text-gray-400">A complete IP portfolio with evidence trails speeds up the investment process. Less back-and-forth, faster closes.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white">Higher Valuations</p>
+                    <p className="text-gray-400">Protected IP is a tangible asset. Trademarks, patents, and clean assignments add real value to your company.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-white/10 p-8">
+              <div className="text-center mb-8">
+                <p className="text-5xl font-bold text-gradient mb-2">73%</p>
+                <p className="text-gray-400">of VCs say IP issues have delayed or killed a deal</p>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                  <span className="text-gray-300">Missing IP assignments</span>
+                  <span className="text-red-400 font-medium">Deal killer</span>
+                </div>
+                <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                  <span className="text-gray-300">No trademark protection</span>
+                  <span className="text-amber-400 font-medium">Valuation hit</span>
+                </div>
+                <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                  <span className="text-gray-300">Expired patent window</span>
+                  <span className="text-red-400 font-medium">Lost opportunity</span>
+                </div>
+                <div className="flex items-center justify-between p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                  <span className="text-emerald-300">Complete IP portfolio</span>
+                  <span className="text-emerald-400 font-medium">Investor ready ✓</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

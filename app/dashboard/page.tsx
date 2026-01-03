@@ -63,10 +63,13 @@ export default async function DashboardPage() {
               <Plus className="w-5 h-5" />
               Create Your First Project
             </Link>
-            <button className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-xl font-medium transition-colors">
+            <Link
+              href="/dashboard/voice"
+              className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-xl font-medium transition-colors"
+            >
               <Mic className="w-5 h-5 text-violet-600" />
               Start with Voice Discovery
-            </button>
+            </Link>
           </div>
         </div>
       ) : (

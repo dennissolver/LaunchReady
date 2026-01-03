@@ -85,10 +85,6 @@ export default async function ProjectPage({ params }: { params: { id: string } }
               <p className="text-gray-500 max-w-2xl">{project.description}</p>
             )}
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-medium transition-colors">
-            <Mic className="w-4 h-4" />
-            Voice Discovery
-          </button>
         </div>
       </div>
 
@@ -171,10 +167,13 @@ export default async function ProjectPage({ params }: { params: { id: string } }
             <div className="p-8 text-center">
               <Shield className="w-12 h-12 text-gray-300 mx-auto mb-3" />
               <p className="text-gray-500 mb-4">No protection items yet</p>
-              <button className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-medium transition-colors mx-auto">
+              <Link
+                href={`/dashboard/voice?project=${params.id}`}
+                className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-medium transition-colors mx-auto"
+              >
                 <Mic className="w-4 h-4" />
                 Start Voice Discovery
-              </button>
+              </Link>
             </div>
           )}
         </div>
