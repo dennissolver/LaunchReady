@@ -5,19 +5,21 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
+  const plan = requestUrl.searchParams.get('plan')
 
   if (code) {
     const cookieStore = cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
-    
-    try {
-      await supabase.auth.exchangeCodeForSession(code)
-    } catch (error) {
-      console.error('Auth callback error:', error)
-      return NextResponse.redirect(new URL('/login?error=auth_failed', request.url))
-    }
+
+    // Exchange code for session
+    await supabase.auth.exchangeCodeForSession(code)
   }
 
-  // Redirect to dashboard after successful auth
-  return NextResponse.redirect(new URL('/dashboard', request.url))
+  // If plan=pro, redirect to Stripe checkout page
+  if (plan === 'pro') {
+    return NextResponse.redirect(new URL('/checkout/pro', requestUrl.origin))
+  }
+
+  // Default: redirect to dashboard
+  return NextResponse.redirect(new URL('/dashboard', requestUrl.origin))
 }
