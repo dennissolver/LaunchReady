@@ -9,10 +9,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 })
     }
 
-    // Initialize client INSIDE the function
     const client = new OpenAI({
-      apiKey: process.env.DATAWIZZ_API_KEY,
-      baseURL: process.env.DATAWIZZ_BASE_URL,
+      apiKey: process.env.OPENAI_API_KEY,
     })
 
     // Normalize URL
@@ -54,7 +52,7 @@ export async function POST(request: NextRequest) {
     const domain = new URL(normalizedUrl).hostname.replace('www.', '')
 
     const completion = await client.chat.completions.create({
-      model: process.env.DATAWIZZ_ENDPOINT || 'gpt-4o-mini',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
