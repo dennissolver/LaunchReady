@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY
-
 export async function POST(request: NextRequest) {
+  const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY
+
   if (!ELEVENLABS_API_KEY) {
+    console.error('Missing ELEVENLABS_API_KEY')
     return NextResponse.json(
       { error: true, message: 'ElevenLabs API key not configured' },
       { status: 500 }
     )
   }
-
+  
   try {
     const { agentId, metadata } = await request.json()
 
