@@ -65,9 +65,10 @@ export function ElevenLabsConversational({
         },
         onError: (error) => {
           console.error('Conversation error:', error)
-          setErrorMessage(error.message || 'Connection error')
+          const message = typeof error === 'string' ? error : 'Connection error'
+          setErrorMessage(message)
           setStatus('error')
-          onError?.(error)
+          onError?.(new Error(message))
         },
         onModeChange: ({ mode }) => {
           // mode can be 'speaking', 'listening', etc.
