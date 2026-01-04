@@ -3,15 +3,14 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-
 export async function POST(request: NextRequest) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+  
   try {
     const cookieStore = cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
-
     const { data: { session } } = await supabase.auth.getSession()
-
+    
     if (!session) {
       return NextResponse.json(
         { error: 'You must be logged in' },
@@ -19,7 +18,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get user's Stripe customer ID
     const { data: profile } = await supabase
       .from('profiles')
       .select('stripe_customer_id')
@@ -33,7 +31,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create billing portal session
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: profile.stripe_customer_id,
       return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings`,
