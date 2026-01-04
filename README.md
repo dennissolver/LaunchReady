@@ -1,179 +1,73 @@
-# LaunchReady
+# Stripe Integration Files for LaunchReady
 
-**Voice-Guided IP Protection & Brand Launch Platform**
+## Files to Copy
 
-LaunchReady helps founders, inventors, and creators protect their intellectual property through AI-powered voice guidance, automated evidence capture, and seamless integration with development platforms.
-
-## 🚀 Quick Start
-
-### 1. Install Dependencies
-
-```bash
-npm install
-```
-
-### 2. Configure Environment Variables
-
-Copy the example environment file:
-
-```bash
-cp .env.example .env.local
-```
-
-Then fill in your credentials in `.env.local`:
-
-- **Supabase**: Get from [Supabase Dashboard](https://supabase.com/dashboard/project/tyjlxbrnogabtybuegpx/settings/api)
-- **ElevenLabs**: Get from [ElevenLabs Settings](https://elevenlabs.io/app/settings/api-keys)
-- **Anthropic**: Get from [Anthropic Console](https://console.anthropic.com/)
-
-### 3. Set Up Database
-
-Push the schema to Supabase:
-
-```bash
-npx supabase db push
-```
-
-Or run migrations manually in the Supabase SQL editor using files in `supabase/migrations/`.
-
-### 4. Run Development Server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to see the app.
-
-## 📁 Project Structure
+Copy these files to your project:
 
 ```
-LaunchReady/
-├── app/                      # Next.js App Router
-│   ├── api/                  # API routes
-│   │   ├── waitlist/         # Waitlist signup endpoint
-│   │   └── voice/            # Voice AI endpoints
-│   ├── (auth)/               # Auth pages (login, callback)
-│   ├── (dashboard)/          # Protected dashboard pages
-│   ├── globals.css           # Global styles
-│   ├── layout.tsx            # Root layout
-│   └── page.tsx              # Landing page with waitlist
-├── components/               # React components
-│   ├── ui/                   # Base UI components
-│   ├── voice/                # Voice assistant components
-│   └── dashboard/            # Dashboard components
-├── lib/                      # Utilities and clients
-│   ├── supabase/             # Supabase client & types
-│   ├── voice/                # Voice prompts & ElevenLabs
-│   └── utils/                # Helper functions
-├── supabase/
-│   └── migrations/           # Database migrations
-└── public/                   # Static assets
+components/UpgradeButton.tsx     → components/UpgradeButton.tsx
+app/page.tsx                     → app/page.tsx (landing page)
+app/signup/page.tsx              → app/signup/page.tsx
+app/auth/callback/page.tsx       → app/auth/callback/page.tsx
 ```
 
-## 🔑 Key Features
+## Environment Variables
 
-### Public Landing Page
-- Educational content about IP protection risks
-- Waitlist signup form with Supabase storage
-- Responsive, modern design
+Add these to Vercel (Settings → Environment Variables):
 
-### Voice Agent (ElevenLabs)
-- Pre-configured agent: `agent_3001ke2r3mfae7ms360g0sb3p17d`
-- Discovery conversation flow
-- Backfill guidance for existing projects
-- Real-time field extraction
+| Variable | Description |
+|----------|-------------|
+| `STRIPE_SECRET_KEY` | From Stripe Dashboard → API Keys |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | From Stripe Dashboard → API Keys |
+| `NEXT_PUBLIC_STRIPE_PRO_PRICE_ID` | From Stripe → Products → Your Pro product → Price ID |
+| `STRIPE_WEBHOOK_SECRET` | From Stripe → Webhooks → Your endpoint → Signing secret |
+| `NEXT_PUBLIC_APP_URL` | `https://launchready-ruby.vercel.app` |
 
-### IP Protection Checklist
-- Visual status for each protection item
-- Urgent deadline alerts
-- Next action recommendations
+## Stripe Setup
 
-### Evidence Vault
-- Automatic timestamp capture
-- Integration with GitHub, Vercel, Supabase, etc.
-- Blockchain anchoring (optional)
+### 1. Create Product & Price
 
-### Investor Data Room
-- One-click shareable links
-- Access tracking and analytics
-- NDA capture
+1. Go to [Stripe Dashboard → Products](https://dashboard.stripe.com/products)
+2. Click **Add product**
+3. Name: `LaunchReady Pro`
+4. Price: `$30.00 USD` / month (recurring)
+5. Save and copy the **Price ID** (starts with `price_`)
 
-## 🗄️ Database Schema
+### 2. Set Up Webhook
 
-### Core Tables
-- `projects` - Founder projects with IP tracking
-- `protection_items` - IP checklist items (trademarks, patents, etc.)
-- `evidence_events` - Timestamped evidence records
-- `integrations` - Connected platforms (GitHub, Vercel, etc.)
-- `collaborators` - Team members and IP assignment status
-- `assets` - Uploaded files and documents
-- `data_rooms` - Investor data room configurations
-- `waitlist` - Pre-launch signups
+1. Go to [Stripe → Webhooks](https://dashboard.stripe.com/webhooks)
+2. Click **Add endpoint**
+3. URL: `https://launchready-ruby.vercel.app/api/stripe/webhook`
+4. Select events:
+   - `checkout.session.completed`
+   - `customer.subscription.updated`
+   - `customer.subscription.deleted`
+   - `invoice.payment_failed`
+5. Copy the **Signing secret** (`whsec_...`)
 
-See `supabase/migrations/` for full schema.
+## How It Works
 
-## 🔌 Integrations
+1. **Landing Page**: Pro "Upgrade" button calls `/api/stripe/checkout`
+   - If logged in → Redirects to Stripe Checkout
+   - If not logged in → Redirects to `/signup?plan=pro`
 
-### Currently Supported
-- **GitHub** - OAuth, repo history, commits, contributors
-- **Vercel** - OAuth, deployments, domains
-- **Supabase** - API key, project data
-- **ElevenLabs** - Conversational AI
+2. **Signup Page**: Detects `?plan=pro` in URL
+   - Shows "Pro Plan Selected" badge
+   - After signup → Redirects to Stripe Checkout
 
-### Coming Soon
-- Netlify, Render, Railway
-- Figma, Stripe
-- Namecheap (domain registration)
+3. **Auth Callback**: After email confirmation
+   - If `?plan=pro` → Redirects to Stripe Checkout
+   - Otherwise → Redirects to Dashboard
 
-## 🎯 Environment Variables
+4. **Webhook**: Handles subscription events
+   - `checkout.session.completed` → Sets user plan to 'pro'
+   - `customer.subscription.deleted` → Sets user plan to 'free'
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | ✅ |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key | ✅ |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key | ✅ |
-| `ELEVENLABS_API_KEY` | ElevenLabs API key | ✅ |
-| `NEXT_PUBLIC_ELEVENLABS_AGENT_ID` | Voice agent ID | ✅ |
-| `ANTHROPIC_API_KEY` | Claude API key for voice chat | ✅ |
-| `GITHUB_CLIENT_ID` | GitHub OAuth app ID | Optional |
-| `GITHUB_CLIENT_SECRET` | GitHub OAuth secret | Optional |
+## Test Mode
 
-## 📝 Deployment
+Use Stripe test mode first:
+- Test card: `4242 4242 4242 4242`
+- Any future expiry date
+- Any CVC
 
-### Vercel (Recommended)
-
-1. Push to GitHub
-2. Import project in Vercel
-3. Add environment variables
-4. Deploy
-
-### Supabase Setup
-
-1. Create project at [supabase.com](https://supabase.com)
-2. Run migrations from `supabase/migrations/`
-3. Enable Row Level Security (already in migrations)
-4. Create storage bucket named `assets`
-
-## 🛠️ Development
-
-```bash
-# Run dev server
-npm run dev
-
-# Build for production
-npm run build
-
-# Generate Supabase types
-npm run db:generate
-
-# Push schema to Supabase
-npm run db:push
-```
-
-## 📄 License
-
-Proprietary - © 2026 Global Buildtech Australia Pty Ltd
-
----
-
-Built with ❤️ for founders who want to protect their ideas.
+Switch to live mode when ready to accept real payments.

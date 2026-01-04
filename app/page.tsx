@@ -7,6 +7,7 @@ import {
   Zap, Lock, FileCheck, Mic, Github, Globe, Database,
   ChevronDown, X, Sparkles, TrendingUp, Play, Server, Users, Check
 } from 'lucide-react'
+import { UpgradeButton } from '@/components/UpgradeButton'
 
 // Scroll Progress Hook
 function useScrollProgress() {
@@ -184,35 +185,18 @@ export default function LandingPage() {
             </div>
             <div className="hidden md:flex items-center gap-8">
               <a href="#problem" className="text-sm text-gray-400 hover:text-white transition-colors">The Problem</a>
-              <a href="#solution" className="text-sm text-gray-400 hover:text-white transition-colors">Solution</a>
               <a href="#features" className="text-sm text-gray-400 hover:text-white transition-colors">Features</a>
               <a href="#pricing" className="text-sm text-gray-400 hover:text-white transition-colors">Pricing</a>
-              <Link 
-                href="/login"
-                className="text-sm text-gray-300 hover:text-white transition-colors"
-              >
-                Log In
+            </div>
+            <div className="flex items-center gap-4">
+              <Link href="/login" className="text-sm text-gray-400 hover:text-white transition-colors">
+                Sign In
               </Link>
-              <Link 
+              <Link
                 href="/signup"
                 className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors"
               >
-                Get Started Free
-              </Link>
-            </div>
-            {/* Mobile menu */}
-            <div className="md:hidden flex items-center gap-3">
-              <Link 
-                href="/login"
-                className="text-sm text-gray-300"
-              >
-                Log In
-              </Link>
-              <Link 
-                href="/signup"
-                className="px-3 py-1.5 bg-violet-600 rounded-lg text-sm font-medium"
-              >
-                Sign Up
+                Get Started
               </Link>
             </div>
           </div>
@@ -220,107 +204,73 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        {/* Background effects */}
-        <div className="absolute inset-0 hero-gradient opacity-50" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-900/20 via-transparent to-transparent" />
-        
-        {/* Animated grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f12_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f12_1px,transparent_1px)] bg-[size:64px_64px]" />
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="pt-32 pb-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-violet-500/10 via-transparent to-transparent" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center max-w-4xl mx-auto">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-300 text-sm mb-8">
-              <Sparkles className="w-4 h-4" />
-              <span>Free for Founders • Pro for $30/mo</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-full text-red-300 text-sm mb-8">
+              <AlertTriangle className="w-4 h-4" />
+              <span>72% of startups have unprotected IP assets</span>
             </div>
-
-            {/* Headline */}
+            
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-              Protect Your Ideas{' '}
-              <span className="text-gradient">Before Someone Else Does</span>
+              Your Startup's IP Is{' '}
+              <span className="text-gradient">Vulnerable</span>
             </h1>
-
-            {/* Subheadline */}
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-10">
-              Most founders don't realise their IP is at risk until it's too late. 
-              LaunchReady uses AI to discover what you've built, capture evidence automatically, 
-              and ensure every protection is in place.
+            
+            <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
+              Every day without IP protection is a day someone can steal your brand, 
+              your code, or your ideas. LaunchReady helps founders identify and protect 
+              their intellectual property before it's too late.
             </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
               <Link
                 href="/signup"
-                className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 text-lg"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl font-semibold transition-all text-lg"
               >
-                Start Protecting Your IP — Free
+                Start Free IP Audit
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <a
-                href="#pricing"
-                className="w-full sm:w-auto px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                href="#demo"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 rounded-xl font-semibold transition-all"
               >
-                View Pricing
+                <Play className="w-5 h-5" />
+                Watch Demo
               </a>
             </div>
 
-            {/* Trust indicators */}
-            <div className="mt-12 flex flex-wrap items-center justify-center gap-8 text-sm text-gray-500">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <span>No credit card required</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Lock className="w-4 h-4" />
-                <span>Enterprise-grade security</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4" />
-                <span>SOC 2 compliant</span>
-              </div>
+            {/* Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {horrorStats.map((item, i) => (
+                <div key={i} className="p-4 rounded-xl bg-white/5 border border-white/10">
+                  <p className="text-2xl font-bold text-white">{item.stat}</p>
+                  <p className="text-sm text-gray-500">{item.label}</p>
+                </div>
+              ))}
             </div>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <ChevronDown className="w-6 h-6 text-gray-500" />
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-16 bg-slate-900/50 border-y border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {horrorStats.map((item, i) => (
-              <div key={i} className="text-center">
-                <div className="text-4xl font-bold text-gradient mb-2">{item.stat}</div>
-                <div className="text-sm text-gray-400">{item.label}</div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
 
       {/* Problem Section */}
-      <section id="problem" className="py-24">
+      <section id="problem" className="py-24 bg-slate-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              The IP Nightmares <span className="text-red-400">No One Warned You About</span>
+              The IP Risks You're <span className="text-red-400">Ignoring</span>
             </h2>
             <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Every week, founders discover they've made critical mistakes that could cost them their company.
+              Most founders don't think about IP until it's too late. Here's what's probably happening to you right now.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             {dangerCards.map((card, i) => (
               <div 
-                key={i} 
-                className={`p-6 rounded-2xl border card-hover ${
+                key={i}
+                className={`p-6 rounded-2xl border ${
                   card.color === 'red' 
                     ? 'bg-red-500/5 border-red-500/20' 
                     : 'bg-amber-500/5 border-amber-500/20'
@@ -338,67 +288,6 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-
-          <div className="mt-12 text-center">
-            <p className="text-2xl font-semibold text-gray-300 mb-4">
-              The worst part? <span className="text-white">These are all preventable.</span>
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Solution Section */}
-      <section id="solution" className="py-24 bg-gradient-to-b from-slate-900/50 to-slate-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-300 text-sm mb-6">
-              <Zap className="w-4 h-4" />
-              <span>Introducing LaunchReady</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              Your AI-Powered <span className="text-gradient">IP Protection System</span>
-            </h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Think of it as Stripe Atlas for intellectual property. We guide you through protecting your ideas, 
-              automate evidence capture, and prepare everything your lawyers need.
-            </p>
-          </div>
-
-          {/* How it works */}
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-violet-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-violet-400">1</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Talk to Our AI</h3>
-              <p className="text-gray-400">Our voice agent asks about your project, what you've built, and what platforms you use. It takes 5 minutes.</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-violet-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-violet-400">2</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">We Capture Everything</h3>
-              <p className="text-gray-400">Connect your dev tools. We automatically pull timestamps, commits, deployments — building your evidence vault.</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-violet-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-violet-400">3</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">See Your IP Status</h3>
-              <p className="text-gray-400">Your protection checklist shows green for protected, red for at risk. Take action with one click.</p>
-            </div>
-          </div>
-
-          {/* CTA in solution */}
-          <div className="text-center">
-            <Link
-              href="/signup"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl font-semibold transition-all text-lg"
-            >
-              Get Started — It's Free
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -406,15 +295,22 @@ export default function LandingPage() {
       <section id="features" className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-violet-500/10 border border-violet-500/20 rounded-full text-violet-300 text-sm mb-6">
+              <Sparkles className="w-4 h-4" />
+              <span>AI-Powered Protection</span>
+            </div>
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              Everything You Need to <span className="text-gradient">Launch Protected</span>
+              Everything You Need to <span className="text-gradient">Protect Your Startup</span>
             </h2>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              From discovery to filing, we guide you through every step of IP protection.
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, i) => (
-              <div key={i} className="p-6 rounded-2xl bg-white/5 border border-white/10 card-hover">
-                <div className="w-12 h-12 bg-violet-500/20 rounded-xl flex items-center justify-center mb-4">
+              <div key={i} className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                <div className="w-12 h-12 bg-gradient-to-br from-violet-500/20 to-indigo-500/20 rounded-xl flex items-center justify-center mb-4">
                   <feature.icon className="w-6 h-6 text-violet-400" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
@@ -426,15 +322,14 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-24 bg-gradient-to-b from-slate-900/50 to-slate-950">
+      <section id="pricing" className="py-24 bg-slate-900/50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              Simple, Transparent <span className="text-gradient">Pricing</span>
+              Simple, Transparent Pricing
             </h2>
             <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Start free with enterprise-grade security. Upgrade for dedicated infrastructure 
-              and complete data isolation.
+              Start free with shared infrastructure. Upgrade to Pro for dedicated, isolated resources.
             </p>
           </div>
 
@@ -491,18 +386,23 @@ export default function LandingPage() {
                   ))}
                 </ul>
 
-                {/* CTA */}
-                <Link
-                  href={plan.ctaLink}
-                  className={`w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${
-                    plan.popular 
-                      ? 'bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white' 
-                      : 'bg-white/10 hover:bg-white/20 text-white'
-                  }`}
-                >
-                  {plan.cta}
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
+                {/* CTA - Pro uses UpgradeButton, Free uses Link */}
+                {plan.popular ? (
+                  <UpgradeButton
+                    className="w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white"
+                  >
+                    {plan.cta}
+                    <ArrowRight className="w-4 h-4" />
+                  </UpgradeButton>
+                ) : (
+                  <Link
+                    href={plan.ctaLink}
+                    className="w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white"
+                  >
+                    {plan.cta}
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                )}
               </div>
             ))}
           </div>
@@ -639,12 +539,11 @@ export default function LandingPage() {
               Start Free
               <ArrowRight className="w-6 h-6" />
             </Link>
-            <Link
-              href="/signup?plan=pro"
+            <UpgradeButton
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-semibold transition-all"
             >
               Start with Pro — $30/mo
-            </Link>
+            </UpgradeButton>
           </div>
 
           <p className="mt-6 text-sm text-gray-500">
