@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
-const client = new OpenAI({
-  apiKey: process.env.DATAWIZZ_API_KEY,
-  baseURL: process.env.DATAWIZZ_BASE_URL,
-})
-
 export async function POST(request: NextRequest) {
   try {
-    const { url } = await request.json()
+    const { url, projectName } = await request.json()
 
     if (!url) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 })
     }
+
+    // Initialize client INSIDE the function
+    const client = new OpenAI({
+      apiKey: process.env.DATAWIZZ_API_KEY,
+      baseURL: process.env.DATAWIZZ_BASE_URL,
+    })
 
     // Normalize URL
     let normalizedUrl = url.trim()
@@ -39,6 +40,9 @@ export async function POST(request: NextRequest) {
           .replace(/<[^>]+>/g, ' ')
           .replace(/&nbsp;/g, ' ')
           .replace(/&amp;/g, '&')
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/&quot;/g, '"')
           .replace(/\s+/g, ' ')
           .trim()
           .slice(0, 3000)
@@ -64,8 +68,8 @@ Respond with ONLY the description, no quotes or preamble.`
         {
           role: 'user',
           content: pageContent
-            ? `Domain: ${domain}\n\nPage content:\n${pageContent}`
-            : `Domain: ${domain}\n\nNo page content available - please suggest a description based on the domain name.`
+            ? `Project name: ${projectName || 'Unknown'}\nDomain: ${domain}\n\nPage content:\n${pageContent}`
+            : `Project name: ${projectName || 'Unknown'}\nDomain: ${domain}\n\nNo page content available - please suggest a description based on the domain name.`
         }
       ],
       max_tokens: 150,
