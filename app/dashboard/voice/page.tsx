@@ -11,8 +11,9 @@ export default function VoiceDiscoveryPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
+      {/* Header */}
       <div className="mb-8">
-        <Link
+        <Link 
           href={projectId ? `/dashboard/projects/${projectId}` : '/dashboard'}
           className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4"
         >
@@ -25,18 +26,34 @@ export default function VoiceDiscoveryPage() {
         </p>
       </div>
 
+      {/* Legal Disclaimer Banner */}
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+        <p className="text-sm text-amber-800 flex items-start gap-2">
+          <span className="w-5 h-5 rounded-full bg-amber-200 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">i</span>
+          <span>
+            <strong>Educational guidance only.</strong> This AI assistant helps you understand IP concepts and identify potential protections. 
+            This is not legal advice. For legal filings and contracts, we'll connect you with our specialist legal partners.
+          </span>
+        </p>
+      </div>
+
+      {/* Main Card */}
       <div className="bg-white rounded-2xl border border-gray-200 p-8">
+        {/* Intro */}
         <div className="text-center mb-8">
           <div className="w-20 h-20 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Mic className="w-10 h-10 text-white" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Let's discover your IP</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">
+            Let's discover your IP
+          </h2>
           <p className="text-gray-500">
-            I'll ask you a few questions about your project. Just speak naturally and I'll identify
+            I'll ask you a few questions about your project. Just speak naturally and I'll identify 
             trademarks, patents, domains, and other protections you might need.
           </p>
         </div>
 
+        {/* What we'll cover */}
         <div className="bg-violet-50 rounded-xl p-4 mb-8">
           <div className="flex items-start gap-3">
             <Sparkles className="w-5 h-5 text-violet-600 mt-0.5" />
@@ -53,6 +70,7 @@ export default function VoiceDiscoveryPage() {
           </div>
         </div>
 
+        {/* Voice Component */}
         <ElevenLabsConversational
           metadata={{
             project_id: projectId || undefined,
@@ -60,23 +78,27 @@ export default function VoiceDiscoveryPage() {
           }}
           onFieldExtracted={(field, value) => {
             console.log('Extracted:', field, value)
+            // TODO: Save extracted fields to project
           }}
           onConversationEnd={(result) => {
             console.log('Conversation ended:', result)
+            // TODO: Redirect to project with findings
           }}
         />
 
+        {/* Privacy note */}
         <div className="mt-6 pt-6 border-t border-gray-100">
           <div className="flex items-start gap-2 text-xs text-gray-500">
             <Shield className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <p>
-              Your conversation is encrypted and processed securely. We only save the IP items
+              Your conversation is encrypted and processed securely. We only save the IP items 
               we discover, not the full conversation audio.
             </p>
           </div>
         </div>
       </div>
 
+      {/* Tips */}
       <div className="mt-6 grid sm:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="font-medium text-gray-900 mb-1">🎯 Be specific</p>

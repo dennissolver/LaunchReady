@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import {
-  Shield, AlertTriangle, Clock, CheckCircle2, ArrowRight,
+import { 
+  Shield, AlertTriangle, Clock, CheckCircle2, ArrowRight, 
   Zap, Lock, FileCheck, Mic, Github, Globe, Database,
   ChevronDown, X, Sparkles, TrendingUp, Play, Server, Users, Check
 } from 'lucide-react'
@@ -11,7 +11,7 @@ import {
 // Scroll Progress Hook
 function useScrollProgress() {
   const [progress, setProgress] = useState(0)
-
+  
   useEffect(() => {
     const updateProgress = () => {
       const scrollTop = window.scrollY
@@ -19,11 +19,11 @@ function useScrollProgress() {
       const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0
       setProgress(scrollPercent)
     }
-
+    
     window.addEventListener('scroll', updateProgress)
     return () => window.removeEventListener('scroll', updateProgress)
   }, [])
-
+  
   return progress
 }
 
@@ -103,7 +103,7 @@ const testimonialPlaceholders = [
   },
   {
     quote: "We discovered 3 contractors had never signed IP assignments. Could have killed our Series A.",
-    author: "Marcus",
+    author: "Marcus", 
     role: "CTO",
   },
 ]
@@ -161,12 +161,12 @@ const pricingPlans = [
 
 export default function LandingPage() {
   const scrollProgress = useScrollProgress()
-
+  
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       {/* Scroll Progress Bar */}
       <div className="fixed top-0 left-0 right-0 h-1 bg-slate-800 z-[60]">
-        <div
+        <div 
           className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 transition-all duration-150"
           style={{ width: `${scrollProgress}%` }}
         />
@@ -187,13 +187,13 @@ export default function LandingPage() {
               <a href="#solution" className="text-sm text-gray-400 hover:text-white transition-colors">Solution</a>
               <a href="#features" className="text-sm text-gray-400 hover:text-white transition-colors">Features</a>
               <a href="#pricing" className="text-sm text-gray-400 hover:text-white transition-colors">Pricing</a>
-              <Link
+              <Link 
                 href="/login"
                 className="text-sm text-gray-300 hover:text-white transition-colors"
               >
                 Log In
               </Link>
-              <Link
+              <Link 
                 href="/signup"
                 className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors"
               >
@@ -202,13 +202,13 @@ export default function LandingPage() {
             </div>
             {/* Mobile menu */}
             <div className="md:hidden flex items-center gap-3">
-              <Link
+              <Link 
                 href="/login"
                 className="text-sm text-gray-300"
               >
                 Log In
               </Link>
-              <Link
+              <Link 
                 href="/signup"
                 className="px-3 py-1.5 bg-violet-600 rounded-lg text-sm font-medium"
               >
@@ -224,10 +224,10 @@ export default function LandingPage() {
         {/* Background effects */}
         <div className="absolute inset-0 hero-gradient opacity-50" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-900/20 via-transparent to-transparent" />
-
+        
         {/* Animated grid */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f12_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f12_1px,transparent_1px)] bg-[size:64px_64px]" />
-
+        
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
             {/* Badge */}
@@ -244,8 +244,8 @@ export default function LandingPage() {
 
             {/* Subheadline */}
             <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-10">
-              Most founders don't realise their IP is at risk until it's too late.
-              LaunchReady uses AI to discover what you've built, capture evidence automatically,
+              Most founders don't realise their IP is at risk until it's too late. 
+              LaunchReady uses AI to discover what you've built, capture evidence automatically, 
               and ensure every protection is in place.
             </p>
 
@@ -318,8 +318,8 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 gap-6">
             {dangerCards.map((card, i) => (
-              <div
-                key={i}
+              <div 
+                key={i} 
                 className={`p-6 rounded-2xl border card-hover ${
                   card.color === 'red' 
                     ? 'bg-red-500/5 border-red-500/20' 
@@ -359,7 +359,7 @@ export default function LandingPage() {
               Your AI-Powered <span className="text-gradient">IP Protection System</span>
             </h2>
             <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Think of it as Stripe Atlas for intellectual property. We guide you through protecting your ideas,
+              Think of it as Stripe Atlas for intellectual property. We guide you through protecting your ideas, 
               automate evidence capture, and prepare everything your lawyers need.
             </p>
           </div>
@@ -433,14 +433,14 @@ export default function LandingPage() {
               Simple, Transparent <span className="text-gradient">Pricing</span>
             </h2>
             <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Start free with enterprise-grade security. Upgrade for dedicated infrastructure
+              Start free with enterprise-grade security. Upgrade for dedicated infrastructure 
               and complete data isolation.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
             {pricingPlans.map((plan) => (
-              <div
+              <div 
                 key={plan.name}
                 className={`relative rounded-2xl p-8 ${
                   plan.popular 
@@ -559,7 +559,7 @@ export default function LandingPage() {
                 IP Protection Makes You <span className="text-gradient">More Investable</span>
               </h2>
               <p className="text-xl text-gray-400 mb-8">
-                Investors don't just look at your product — they look at your risk profile.
+                Investors don't just look at your product — they look at your risk profile. 
                 Unprotected IP is a red flag that can kill deals or slash valuations.
               </p>
               <div className="space-y-4">
@@ -627,7 +627,7 @@ export default function LandingPage() {
             Don't Let Your Hard Work <span className="text-red-400">Become Someone Else's</span>
           </h2>
           <p className="text-xl text-gray-400 mb-10">
-            Join thousands of founders who are protecting their ideas with LaunchReady.
+            Join thousands of founders who are protecting their ideas with LaunchReady. 
             Start free, upgrade when you need dedicated infrastructure.
           </p>
 
@@ -654,24 +654,39 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                <Shield className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-lg font-bold">LaunchReady</span>
-            </div>
-            <div className="flex items-center gap-6 text-sm text-gray-500">
-              <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
-              <a href="#" className="hover:text-white transition-colors">Privacy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms</a>
-              <a href="mailto:hello@launchready.io" className="hover:text-white transition-colors">Contact</a>
-            </div>
-            <p className="text-sm text-gray-500">
-              © 2026 LaunchReady. All rights reserved.
+      <footer className="border-t border-white/10">
+        {/* Legal Disclaimer */}
+        <div className="border-b border-white/10 bg-slate-900/50">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <p className="text-xs text-gray-500 text-center flex items-center justify-center gap-2">
+              <span className="w-4 h-4 rounded-full border border-gray-600 flex items-center justify-center text-[10px] font-bold">i</span>
+              <span>
+                <strong className="text-gray-400">Not legal advice.</strong> LaunchReady provides educational guidance and IP tracking tools only. 
+                For legal advice, filings, and contracts, we connect you with our specialist legal partners.
+              </span>
             </p>
+          </div>
+        </div>
+        
+        <div className="py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-lg font-bold">LaunchReady</span>
+              </div>
+              <div className="flex items-center gap-6 text-sm text-gray-500">
+                <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
+                <a href="#" className="hover:text-white transition-colors">Privacy</a>
+                <a href="#" className="hover:text-white transition-colors">Terms</a>
+                <a href="mailto:hello@launchready.io" className="hover:text-white transition-colors">Contact</a>
+              </div>
+              <p className="text-sm text-gray-500">
+                © 2026 LaunchReady. All rights reserved.
+              </p>
+            </div>
           </div>
         </div>
       </footer>

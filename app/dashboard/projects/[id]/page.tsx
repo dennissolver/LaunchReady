@@ -2,7 +2,7 @@ import { cookies } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import {
+import { 
   ArrowLeft, Shield, CheckCircle2, Clock, AlertTriangle,
   Plus, Mic, Github, FileBox, Users, Calendar, ExternalLink
 } from 'lucide-react'
@@ -10,7 +10,7 @@ import {
 export default async function ProjectPage({ params }: { params: { id: string } }) {
   const cookieStore = cookies()
   const supabase = createServerComponentClient({ cookies: () => cookieStore })
-
+  
   const { data: { session } } = await supabase.auth.getSession()
 
   // Get project
@@ -65,14 +65,14 @@ export default async function ProjectPage({ params }: { params: { id: string } }
     <div className="max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <Link
+        <Link 
           href="/dashboard"
           className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Dashboard
         </Link>
-
+        
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3 mb-2">
@@ -131,51 +131,92 @@ export default async function ProjectPage({ params }: { params: { id: string } }
         {/* Protection Checklist */}
         <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200">
           <div className="flex items-center justify-between p-5 border-b border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-900">IP Protection Checklist</h2>
-            <button className="flex items-center gap-1 text-sm text-violet-600 hover:text-violet-500 font-medium">
-              <Plus className="w-4 h-4" />
-              Add Item
-            </button>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">IP Protection Checklist</h2>
+              <p className="text-xs text-gray-500 mt-0.5">Tracking tool only — for legal filings, we'll connect you with our partners</p>
+            </div>
+            <Link 
+              href={`/dashboard/voice?project=${params.id}`}
+              className="flex items-center gap-1 text-sm text-violet-600 hover:text-violet-500 font-medium"
+            >
+              <Mic className="w-4 h-4" />
+              Voice Discovery
+            </Link>
           </div>
-
-          {protectionItems && protectionItems.length > 0 ? (
-            <div className="divide-y divide-gray-100">
-              {protectionItems.map((item: any) => (
-                <div key={item.id} className="p-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      {item.status === 'registered' && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
-                      {item.status === 'pending' && <Clock className="w-5 h-5 text-amber-500" />}
-                      {['not_started', 'urgent', 'expired'].includes(item.status) && <AlertTriangle className="w-5 h-5 text-red-500" />}
-                      <div>
-                        <p className="font-medium text-gray-900">{item.item_name}</p>
-                        <p className="text-sm text-gray-500 capitalize">{item.item_type} • {item.jurisdiction || 'No jurisdiction'}</p>
+          
+          <div className="divide-y divide-gray-100">
+            {/* Default checklist items - merged with any saved items */}
+            {[
+              { category: 'Brand & Trademarks', items: [
+                { key: 'company_name_tm', name: 'Company Name Trademark', description: 'Register your company name as a trademark' },
+                { key: 'product_name_tm', name: 'Product Name Trademark', description: 'Register your product/app name as a trademark' },
+                { key: 'logo_tm', name: 'Logo Trademark', description: 'Register your logo design as a trademark' },
+                { key: 'domain', name: 'Domain Name', description: 'Secure primary domain and key variations' },
+                { key: 'social_handles', name: 'Social Media Handles', description: 'Secure consistent handles across platforms' },
+              ]},
+              { category: 'Patents & Inventions', items: [
+                { key: 'provisional_patent', name: 'Provisional Patent', description: 'File provisional patent for unique innovations' },
+                { key: 'patent_search', name: 'Prior Art Search', description: 'Search existing patents for conflicts' },
+                { key: 'invention_disclosure', name: 'Invention Disclosure', description: 'Document all unique technical innovations' },
+              ]},
+              { category: 'Copyright & Content', items: [
+                { key: 'code_copyright', name: 'Source Code Copyright', description: 'Register copyright for your codebase' },
+                { key: 'design_copyright', name: 'UI/UX Design Copyright', description: 'Protect your interface designs' },
+                { key: 'content_copyright', name: 'Content Copyright', description: 'Protect written content and documentation' },
+              ]},
+              { category: 'Contracts & Agreements', items: [
+                { key: 'contractor_ip', name: 'Contractor IP Assignment', description: 'Ensure all contractor work is assigned to you' },
+                { key: 'employee_ip', name: 'Employee IP Agreement', description: 'Have employees sign IP assignment agreements' },
+                { key: 'cofounder_ip', name: 'Co-founder IP Agreement', description: 'Document IP ownership between founders' },
+                { key: 'nda', name: 'NDA Templates', description: 'Have NDAs ready for sensitive discussions' },
+              ]},
+              { category: 'Trade Secrets', items: [
+                { key: 'trade_secret_policy', name: 'Trade Secret Policy', description: 'Document what information is confidential' },
+                { key: 'access_controls', name: 'Access Controls', description: 'Limit access to sensitive information' },
+              ]},
+            ].map((category) => (
+              <div key={category.category}>
+                <div className="px-4 py-3 bg-gray-50">
+                  <h3 className="text-sm font-semibold text-gray-700">{category.category}</h3>
+                </div>
+                {category.items.map((item) => {
+                  // Check if this item exists in the database
+                  const existingItem = protectionItems?.find((p: any) => 
+                    p.item_name.toLowerCase().includes(item.name.toLowerCase().split(' ')[0]) ||
+                    p.item_type === item.key
+                  )
+                  const status = existingItem?.status || 'not_started'
+                  
+                  return (
+                    <div key={item.key} className="p-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          {status === 'registered' || status === 'protected' ? (
+                            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                          ) : status === 'pending' || status === 'filed' ? (
+                            <Clock className="w-5 h-5 text-amber-500" />
+                          ) : (
+                            <div className="w-5 h-5 rounded-full border-2 border-gray-300" />
+                          )}
+                          <div>
+                            <p className="font-medium text-gray-900">{item.name}</p>
+                            <p className="text-sm text-gray-500">{item.description}</p>
+                          </div>
+                        </div>
+                        <span className={`px-2 py-1 text-xs font-medium rounded capitalize ${
+                          status === 'registered' || status === 'protected' ? 'bg-emerald-100 text-emerald-700' :
+                          status === 'pending' || status === 'filed' ? 'bg-amber-100 text-amber-700' :
+                          'bg-gray-100 text-gray-500'
+                        }`}>
+                          {status === 'not_started' ? 'To Do' : status.replace('_', ' ')}
+                        </span>
                       </div>
                     </div>
-                    <span className={`px-2 py-1 text-xs font-medium rounded capitalize ${
-                      item.status === 'registered' ? 'bg-emerald-100 text-emerald-700' :
-                      item.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
-                      {item.status.replace('_', ' ')}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="p-8 text-center">
-              <Shield className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 mb-4">No protection items yet</p>
-              <Link
-                href={`/dashboard/voice?project=${params.id}`}
-                className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-medium transition-colors mx-auto"
-              >
-                <Mic className="w-4 h-4" />
-                Start Voice Discovery
-              </Link>
-            </div>
-          )}
+                  )
+                })}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Sidebar */}
