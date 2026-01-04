@@ -24,6 +24,13 @@ export default async function DashboardLayout({
     .eq('id', session.user.id)
     .single()
 
+  // Update last active timestamp (non-blocking)
+  supabase
+    .from('profiles')
+    .update({ last_active_at: new Date().toISOString() })
+    .eq('id', session.user.id)
+    .then(() => {})
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <DashboardNav user={session.user} profile={profile} />

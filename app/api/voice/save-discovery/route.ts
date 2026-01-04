@@ -250,7 +250,8 @@ export async function POST(request: NextRequest) {
         .from('evidence_events')
         .insert({
           project_id,
-          event_type: 'voice_discovery',
+          source: 'voice_discovery',
+          event_type: 'discovery_session',
           event_title: 'Voice IP Discovery Session',
           event_description: 'Completed voice discovery session - no specific items identified',
           event_timestamp: new Date().toISOString(),
@@ -326,7 +327,8 @@ export async function POST(request: NextRequest) {
       .from('evidence_events')
       .insert({
         project_id,
-        event_type: 'voice_discovery',
+        source: 'voice_discovery',
+        event_type: 'discovery_session',
         event_title: 'Voice IP Discovery Session',
         event_description: `Completed voice discovery - identified ${results.length} IP items`,
         event_timestamp: new Date().toISOString(),

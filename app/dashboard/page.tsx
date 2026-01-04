@@ -3,7 +3,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import Link from 'next/link'
 import { 
   Plus, Shield, AlertTriangle, Clock, CheckCircle2, AlertCircle,
-  FolderKanban, FileBox, ArrowRight, Mic
+  FolderKanban, FileBox, ArrowRight, Mic, User
 } from 'lucide-react'
 
 export default async function DashboardPage() {
@@ -38,6 +38,9 @@ export default async function DashboardPage() {
 
   const hasProjects = projects && projects.length > 0
   const firstName = profile?.full_name?.split(' ')[0] || 'there'
+  
+  // Check if profile needs completion
+  const profileNeedsCompletion = !profile?.onboarding_completed || !profile?.full_name
 
   // Calculate overall stats across ALL projects
   const allStatuses = allProtectionItems?.map(i => i.status) || []
@@ -79,6 +82,27 @@ export default async function DashboardPage() {
           Here's an overview of your IP protection status.
         </p>
       </div>
+
+      {/* Profile Completion Banner */}
+      {profileNeedsCompletion && (
+        <Link 
+          href="/dashboard/onboarding"
+          className="block mb-6 p-4 bg-violet-50 border border-violet-200 rounded-xl hover:bg-violet-100 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <User className="w-5 h-5 text-violet-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-violet-900">Complete your profile</h3>
+              <p className="text-sm text-violet-700">
+                Add your contact details so we can keep you updated on important IP deadlines.
+              </p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-violet-400" />
+          </div>
+        </Link>
+      )}
 
       {!hasProjects ? (
         // Empty state - onboarding
