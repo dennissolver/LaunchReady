@@ -240,17 +240,19 @@ export async function POST(request: NextRequest) {
     const responseText = textContent?.text || 'I completed the actions but encountered an issue generating a response.'
 
     // Log the interaction
-    await supabase.from('ip_action_log').insert({
-      user_id: user.id,
-      item_id: itemId || 'general',
-      action_type: 'agent_chat',
-      agent_prompt: message,
-      result: 'success',
-      result_data: { 
-        response_preview: responseText.substring(0, 200),
-        tools_used: response.content.filter(b => b.type === 'tool_use').length
-      }
-    }).catch(err => console.error('Failed to log action:', err))
+    // Log the interaction
+    try {
+      await supabase.from('ip_action_log').insert({
+        user_id: user.id,
+        item_id: itemId || 'general',
+        action_type: 'agent_chat',
+        agent_prompt: message,
+        result: 'success',
+        result_data: { response_preview: responseText.substring(0, 200) }
+      })
+    } catch (logError) {
+      console.error('Failed to log action:', logError)
+    }
 
     return NextResponse.json({ 
       response: responseText,
