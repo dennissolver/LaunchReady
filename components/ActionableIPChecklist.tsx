@@ -84,9 +84,9 @@ export default function ActionableIPChecklist({ onAgentPrompt }: ActionableCheck
         .from('ip_checklist_progress')
         .upsert({
           user_id: user.id,
-          item_id: itemId,
           ...progress[itemId],
           ...updates,
+          item_id: itemId,
           updated_at: new Date().toISOString()
         }, {
           onConflict: 'user_id,item_id'
