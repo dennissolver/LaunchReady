@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@11labs/client": "^0.2.0",
+    "@anthropic-ai/sdk": "^0.71.2",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/supabase-js": "^2.45.0",
     "class-variance-authority": "^0.7.0",
