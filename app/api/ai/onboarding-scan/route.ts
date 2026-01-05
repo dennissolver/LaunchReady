@@ -127,7 +127,7 @@ ${takenDomains.map(d => `- ${d}`).join('\n')}` : ''}
 
 **✅ @${baseName} is available on:**
 ${availableHandles.length > 0 
-  ? availableHandles.map(s => `- **${s.platform}** → [Create Account](${s.checkUrl})`).join('\n')
+  ? availableHandles.map(s => `- **${s.platform}** → [Create Account](${s.signupUrl})`).join('\n')
   : '- No platforms available 😔'}
 
 ${takenHandles.length > 0 ? `**❌ Already taken on:**
