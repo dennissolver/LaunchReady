@@ -1,388 +1,416 @@
-import { cookies } from 'next/headers'
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Link from 'next/link'
 import { 
-  Plus, Shield, AlertTriangle, Clock, CheckCircle2, AlertCircle,
-  FolderKanban, FileBox, ArrowRight, Mic, User
+  Shield, Sparkles, CheckCircle2, AlertTriangle, Clock, ArrowRight,
+  Globe, AtSign, FileText, Users, Lock, Lightbulb, ExternalLink,
+  Building2, Zap, TrendingUp, AlertCircle, ChevronRight, Download
 } from 'lucide-react'
+import ProactiveAgentChat from '@/components/ProactiveAgentChat'
 
-export default async function DashboardPage() {
-  const cookieStore = cookies()
-  const supabase = createServerComponentClient({ cookies: () => cookieStore })
+interface ChecklistProgress {
+  item_id: string
+  status: string
+  completed_at?: string
+}
+
+interface ActionLog {
+  id: string
+  item_id: string
+  action_type: string
+  action_label: string
+  result_data?: any
+  created_at: string
+}
+
+export default function SmartDashboard() {
+  const [profile, setProfile] = useState<any>(null)
+  const [progress, setProgress] = useState<ChecklistProgress[]>([])
+  const [recentActions, setRecentActions] = useState<ActionLog[]>([])
+  const [showChat, setShowChat] = useState(false)
+  const [chatPrompt, setChatPrompt] = useState<string | undefined>()
+  const [loading, setLoading] = useState(true)
   
-  const { data: { session } } = await supabase.auth.getSession()
+  const supabase = createClientComponentClient()
 
-  // Get user's projects
-  const { data: projects } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('founder_id', session?.user?.id)
-    .order('updated_at', { ascending: false })
-    .limit(10)
+  useEffect(() => {
+    loadDashboardData()
+  }, [])
 
-  // Get ALL protection items across all user's projects
-  const projectIds = projects?.map(p => p.id) || []
-  const { data: allProtectionItems } = projectIds.length > 0 
-    ? await supabase
-        .from('protection_items')
+  const loadDashboardData = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      // Load profile
+      const { data: profileData } = await supabase
+        .from('profiles')
         .select('*')
-        .in('project_id', projectIds)
-    : { data: [] }
+        .eq('id', user.id)
+        .single()
+      setProfile(profileData)
 
-  // Get user profile
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', session?.user?.id)
-    .single()
+      // Load checklist progress
+      const { data: progressData } = await supabase
+        .from('ip_checklist_progress')
+        .select('*')
+        .eq('user_id', user.id)
+      setProgress(progressData || [])
 
-  const hasProjects = projects && projects.length > 0
-  const firstName = profile?.full_name?.split(' ')[0] || 'there'
-  
-  // Check if profile needs completion
-  const profileNeedsCompletion = !profile?.onboarding_completed || !profile?.full_name
+      // Load recent actions
+      const { data: actionsData } = await supabase
+        .from('ip_action_log')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10)
+      setRecentActions(actionsData || [])
 
-  // Calculate overall stats across ALL projects
-  const allStatuses = allProtectionItems?.map(i => i.status) || []
-  const overallStats = {
-    critical: allStatuses.filter(s => s === 'critical').length,
-    atRisk: allStatuses.filter(s => s === 'at_risk').length,
-    pending: allStatuses.filter(s => ['pending', 'in_progress'].includes(s)).length,
-    protected: allStatuses.filter(s => ['protected', 'registered'].includes(s)).length,
-    totalProjects: projects?.length || 0,
-  }
-
-  // Calculate per-project stats
-  const getProjectStats = (projectId: string) => {
-    const items = allProtectionItems?.filter(i => i.project_id === projectId) || []
-    const statuses = items.map(i => i.status)
-    return {
-      critical: statuses.filter(s => s === 'critical').length,
-      atRisk: statuses.filter(s => s === 'at_risk').length,
-      pending: statuses.filter(s => ['pending', 'in_progress'].includes(s)).length,
-      protected: statuses.filter(s => ['protected', 'registered'].includes(s)).length,
-      total: items.length,
+    } catch (err) {
+      console.error('Error loading dashboard:', err)
+    } finally {
+      setLoading(false)
     }
   }
 
-  // Calculate health score
-  const totalTracked = overallStats.critical + overallStats.atRisk + overallStats.pending + overallStats.protected
-  const overallHealthScore = totalTracked > 0 
-    ? Math.round((overallStats.protected / totalTracked) * 100)
-    : 0
+  const openAgentWithPrompt = (prompt: string) => {
+    setChatPrompt(prompt)
+    setShowChat(true)
+  }
+
+  // Calculate stats
+  const totalItems = 18 // Total checklist items
+  const completedItems = progress.filter(p => p.status === 'done').length
+  const inProgressItems = progress.filter(p => p.status === 'in-progress').length
+  const criticalMissing = ['company-name-tm', 'contractor-ip', 'cofounder-ip'].filter(
+    id => !progress.find(p => p.item_id === id && p.status === 'done')
+  )
+
+  // Determine what to suggest next
+  const getNextAction = () => {
+    if (!profile?.company_name) {
+      return {
+        title: "Let's get started!",
+        description: "Tell me about your company and I'll check trademarks, domains, and social handles",
+        prompt: "I want to check if my company name is available for trademark, domain, and social handles",
+        priority: 'high'
+      }
+    }
+    
+    if (criticalMissing.includes('contractor-ip')) {
+      return {
+        title: "Critical: Contractor IP Assignments",
+        description: "Without signed IP assignments, contractors may own the code they wrote for you",
+        prompt: "Help me create IP assignment agreements for my contractors",
+        priority: 'critical'
+      }
+    }
+    
+    if (criticalMissing.includes('company-name-tm')) {
+      return {
+        title: "Protect your company name",
+        description: "Your company name should be trademarked to prevent others from using it",
+        prompt: `Search for trademark availability for "${profile?.company_name}" and help me start the registration process`,
+        priority: 'high'
+      }
+    }
+    
+    return {
+      title: "Continue your IP protection",
+      description: `You've completed ${completedItems} of ${totalItems} items. Let's keep going!`,
+      prompt: "What should I work on next for my IP protection?",
+      priority: 'medium'
+    }
+  }
+
+  const nextAction = getNextAction()
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full" />
+      </div>
+    )
+  }
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-slate-950 text-white">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Welcome back, {firstName}!
-        </h1>
-        <p className="text-gray-500 mt-1">
-          Here's an overview of your IP protection status.
-        </p>
-      </div>
-
-      {/* Profile Completion Banner */}
-      {profileNeedsCompletion && (
-        <Link 
-          href="/dashboard/onboarding"
-          className="block mb-6 p-4 bg-violet-50 border border-violet-200 rounded-xl hover:bg-violet-100 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <User className="w-5 h-5 text-violet-600" />
+      <header className="border-b border-white/10 bg-slate-900/50 backdrop-blur-lg sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                <Shield className="w-6 h-6" />
+              </div>
+              <div>
+                <h1 className="font-semibold">
+                  {profile?.company_name ? `${profile.company_name} IP Dashboard` : 'LaunchReady'}
+                </h1>
+                <p className="text-sm text-slate-400">Your IP protection status</p>
+              </div>
             </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-violet-900">Complete your profile</h3>
-              <p className="text-sm text-violet-700">
-                Add your contact details so we can keep you updated on important IP deadlines.
-              </p>
-            </div>
-            <ArrowRight className="w-5 h-5 text-violet-400" />
-          </div>
-        </Link>
-      )}
-
-      {!hasProjects ? (
-        // Empty state - onboarding
-        <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center">
-          <div className="w-16 h-16 bg-violet-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Shield className="w-8 h-8 text-violet-600" />
-          </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">
-            Let's protect your first project
-          </h2>
-          <p className="text-gray-500 max-w-md mx-auto mb-6">
-            Start by telling us about your project. Our AI will help identify what 
-            intellectual property you have and what protections you need.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/dashboard/projects/new"
-              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white rounded-xl font-medium transition-colors"
+            
+            <button
+              onClick={() => setShowChat(!showChat)}
+              className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-xl font-medium transition-colors"
             >
-              <Plus className="w-5 h-5" />
-              Create Your First Project
-            </Link>
-            <Link
-              href="/dashboard/voice"
-              className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-xl font-medium transition-colors"
-            >
-              <Mic className="w-5 h-5 text-violet-600" />
-              Start with Voice Discovery
-            </Link>
+              <Sparkles className="w-4 h-4" />
+              Ask Agent
+            </button>
           </div>
         </div>
-      ) : (
-        <>
-          {/* Critical Alert Banner */}
-          {overallStats.critical > 0 && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-red-900">Critical Action Required</h3>
-                  <p className="text-sm text-red-700 mt-1">
-                    You have {overallStats.critical} critical item{overallStats.critical > 1 ? 's' : ''} across your projects that need{overallStats.critical === 1 ? 's' : ''} immediate attention.
-                  </p>
-                </div>
-                <Link 
-                  href="#projects"
-                  className="text-sm font-medium text-red-700 hover:text-red-800 whitespace-nowrap"
-                >
-                  View details →
-                </Link>
-              </div>
-            </div>
-          )}
+      </header>
 
-          {/* Overall Stats Grid - Traffic Light Style */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-            <div className={`bg-white rounded-xl border-2 p-5 ${overallStats.critical > 0 ? 'border-red-300' : 'border-gray-200'}`}>
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${overallStats.critical > 0 ? 'bg-red-100' : 'bg-gray-100'}`}>
-                  <AlertCircle className={`w-5 h-5 ${overallStats.critical > 0 ? 'text-red-600' : 'text-gray-400'}`} />
-                </div>
-                <div>
-                  <p className={`text-2xl font-bold ${overallStats.critical > 0 ? 'text-red-600' : 'text-gray-400'}`}>
-                    {overallStats.critical}
-                  </p>
-                  <p className="text-sm text-gray-500">Critical</p>
-                </div>
-              </div>
-            </div>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid lg:grid-cols-3 gap-6">
+          
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
             
-            <div className={`bg-white rounded-xl border-2 p-5 ${overallStats.atRisk > 0 ? 'border-red-200' : 'border-gray-200'}`}>
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${overallStats.atRisk > 0 ? 'bg-red-50' : 'bg-gray-100'}`}>
-                  <AlertTriangle className={`w-5 h-5 ${overallStats.atRisk > 0 ? 'text-red-500' : 'text-gray-400'}`} />
-                </div>
-                <div>
-                  <p className={`text-2xl font-bold ${overallStats.atRisk > 0 ? 'text-red-500' : 'text-gray-400'}`}>
-                    {overallStats.atRisk}
-                  </p>
-                  <p className="text-sm text-gray-500">At Risk</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className={`bg-white rounded-xl border-2 p-5 ${overallStats.pending > 0 ? 'border-amber-200' : 'border-gray-200'}`}>
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${overallStats.pending > 0 ? 'bg-amber-100' : 'bg-gray-100'}`}>
-                  <Clock className={`w-5 h-5 ${overallStats.pending > 0 ? 'text-amber-600' : 'text-gray-400'}`} />
-                </div>
-                <div>
-                  <p className={`text-2xl font-bold ${overallStats.pending > 0 ? 'text-amber-600' : 'text-gray-400'}`}>
-                    {overallStats.pending}
-                  </p>
-                  <p className="text-sm text-gray-500">In Progress</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className={`bg-white rounded-xl border-2 p-5 ${overallStats.protected > 0 ? 'border-emerald-200' : 'border-gray-200'}`}>
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${overallStats.protected > 0 ? 'bg-emerald-100' : 'bg-gray-100'}`}>
-                  <CheckCircle2 className={`w-5 h-5 ${overallStats.protected > 0 ? 'text-emerald-600' : 'text-gray-400'}`} />
-                </div>
-                <div>
-                  <p className={`text-2xl font-bold ${overallStats.protected > 0 ? 'text-emerald-600' : 'text-gray-400'}`}>
-                    {overallStats.protected}
-                  </p>
-                  <p className="text-sm text-gray-500">Protected</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center">
-                  <FolderKanban className="w-5 h-5 text-violet-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">{overallStats.totalProjects}</p>
-                  <p className="text-sm text-gray-500">Projects</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Health Score Banner */}
-          {totalTracked > 0 && (
-            <div className={`mb-8 p-5 rounded-xl border-2 ${
-              overallHealthScore >= 70 ? 'bg-emerald-50 border-emerald-200' :
-              overallHealthScore >= 40 ? 'bg-amber-50 border-amber-200' : 'bg-red-50 border-red-200'
+            {/* Priority Action Card */}
+            <div className={`rounded-2xl p-6 border ${
+              nextAction.priority === 'critical' 
+                ? 'bg-red-500/10 border-red-500/30' 
+                : nextAction.priority === 'high'
+                  ? 'bg-amber-500/10 border-amber-500/30'
+                  : 'bg-violet-500/10 border-violet-500/30'
             }`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className={`font-semibold ${
-                    overallHealthScore >= 70 ? 'text-emerald-900' :
-                    overallHealthScore >= 40 ? 'text-amber-900' : 'text-red-900'
-                  }`}>
-                    Overall IP Health Score
-                  </h3>
-                  <p className={`text-sm mt-1 ${
-                    overallHealthScore >= 70 ? 'text-emerald-700' :
-                    overallHealthScore >= 40 ? 'text-amber-700' : 'text-red-700'
-                  }`}>
-                    {overallHealthScore >= 70 
-                      ? "Great job! Most of your IP is protected." 
-                      : overallHealthScore >= 40 
-                        ? "You're making progress. Keep working on those pending items."
-                        : "Your IP needs attention. Focus on critical and at-risk items."}
-                  </p>
-                </div>
-                <div className={`text-4xl font-bold ${
-                  overallHealthScore >= 70 ? 'text-emerald-600' :
-                  overallHealthScore >= 40 ? 'text-amber-600' : 'text-red-600'
-                }`}>
-                  {overallHealthScore}%
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Projects with Status Indicators */}
-          <div id="projects" className="bg-white rounded-2xl border border-gray-200 mb-8">
-            <div className="flex items-center justify-between p-5 border-b border-gray-100">
-              <h2 className="text-lg font-semibold text-gray-900">Your Projects</h2>
-              <Link
-                href="/dashboard/projects"
-                className="text-sm text-violet-600 hover:text-violet-500 font-medium flex items-center gap-1"
-              >
-                View all <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <div className="divide-y divide-gray-100">
-              {projects.map((project: any) => {
-                const projectStats = getProjectStats(project.id)
-                const hasIssues = projectStats.critical > 0 || projectStats.atRisk > 0
-                
-                return (
-                  <Link
-                    key={project.id}
-                    href={`/dashboard/projects/${project.id}`}
-                    className={`flex items-center gap-4 p-5 hover:bg-gray-50 transition-colors ${
-                      projectStats.critical > 0 ? 'bg-red-50/30' : ''
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    {nextAction.priority === 'critical' && (
+                      <span className="px-2 py-0.5 text-xs bg-red-500 text-white rounded-full font-medium">CRITICAL</span>
+                    )}
+                    {nextAction.priority === 'high' && (
+                      <span className="px-2 py-0.5 text-xs bg-amber-500 text-white rounded-full font-medium">IMPORTANT</span>
+                    )}
+                    <Zap className={`w-4 h-4 ${
+                      nextAction.priority === 'critical' ? 'text-red-400' : 
+                      nextAction.priority === 'high' ? 'text-amber-400' : 'text-violet-400'
+                    }`} />
+                    <span className="text-sm text-slate-400">Suggested Next Step</span>
+                  </div>
+                  <h2 className="text-xl font-semibold mb-2">{nextAction.title}</h2>
+                  <p className="text-slate-400 mb-4">{nextAction.description}</p>
+                  <button
+                    onClick={() => openAgentWithPrompt(nextAction.prompt)}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all ${
+                      nextAction.priority === 'critical'
+                        ? 'bg-red-600 hover:bg-red-500 text-white'
+                        : nextAction.priority === 'high'
+                          ? 'bg-amber-600 hover:bg-amber-500 text-white'
+                          : 'bg-violet-600 hover:bg-violet-500 text-white'
                     }`}
                   >
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      projectStats.critical > 0 ? 'bg-red-100' :
-                      projectStats.atRisk > 0 ? 'bg-amber-100' :
-                      projectStats.protected > 0 ? 'bg-emerald-100' : 'bg-violet-100'
-                    }`}>
-                      <FolderKanban className={`w-5 h-5 ${
-                        projectStats.critical > 0 ? 'text-red-600' :
-                        projectStats.atRisk > 0 ? 'text-amber-600' :
-                        projectStats.protected > 0 ? 'text-emerald-600' : 'text-violet-600'
-                      }`} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 truncate">{project.name}</p>
-                      <p className="text-sm text-gray-500 capitalize">{project.status}</p>
-                    </div>
-                    
-                    {/* Traffic Light Indicators */}
-                    <div className="flex items-center gap-3">
-                      {projectStats.critical > 0 && (
-                        <div className="flex items-center gap-1 px-2 py-1 bg-red-100 rounded-full">
-                          <AlertCircle className="w-3.5 h-3.5 text-red-600" />
-                          <span className="text-xs font-medium text-red-700">{projectStats.critical}</span>
-                        </div>
-                      )}
-                      {projectStats.atRisk > 0 && (
-                        <div className="flex items-center gap-1 px-2 py-1 bg-red-50 rounded-full">
-                          <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
-                          <span className="text-xs font-medium text-red-600">{projectStats.atRisk}</span>
-                        </div>
-                      )}
-                      {projectStats.pending > 0 && (
-                        <div className="flex items-center gap-1 px-2 py-1 bg-amber-100 rounded-full">
-                          <Clock className="w-3.5 h-3.5 text-amber-600" />
-                          <span className="text-xs font-medium text-amber-700">{projectStats.pending}</span>
-                        </div>
-                      )}
-                      {projectStats.protected > 0 && (
-                        <div className="flex items-center gap-1 px-2 py-1 bg-emerald-100 rounded-full">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                          <span className="text-xs font-medium text-emerald-700">{projectStats.protected}</span>
-                        </div>
-                      )}
-                      {projectStats.total === 0 && (
-                        <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
-                          {project.discovery_completed ? 'No items' : 'Setup Needed'}
-                        </span>
-                      )}
-                      <ArrowRight className="w-4 h-4 text-gray-400" />
-                    </div>
-                  </Link>
-                )
-              })}
+                    <Sparkles className="w-4 h-4" />
+                    Let's Do This
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
             </div>
+
+            {/* Progress Overview */}
+            <div className="bg-slate-900/50 border border-white/10 rounded-2xl p-6">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-violet-400" />
+                Protection Progress
+              </h3>
+              
+              <div className="mb-4">
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-slate-400">Overall Completion</span>
+                  <span className="font-medium">{Math.round((completedItems / totalItems) * 100)}%</span>
+                </div>
+                <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 transition-all duration-500"
+                    style={{ width: `${(completedItems / totalItems) * 100}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center p-3 bg-emerald-500/10 rounded-xl">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto mb-1" />
+                  <p className="text-2xl font-bold text-emerald-400">{completedItems}</p>
+                  <p className="text-xs text-slate-400">Complete</p>
+                </div>
+                <div className="text-center p-3 bg-amber-500/10 rounded-xl">
+                  <Clock className="w-6 h-6 text-amber-400 mx-auto mb-1" />
+                  <p className="text-2xl font-bold text-amber-400">{inProgressItems}</p>
+                  <p className="text-xs text-slate-400">In Progress</p>
+                </div>
+                <div className="text-center p-3 bg-slate-500/10 rounded-xl">
+                  <AlertCircle className="w-6 h-6 text-slate-400 mx-auto mb-1" />
+                  <p className="text-2xl font-bold text-slate-400">{totalItems - completedItems - inProgressItems}</p>
+                  <p className="text-xs text-slate-400">To Do</p>
+                </div>
+              </div>
+
+              <Link
+                href="/checklist"
+                className="mt-4 w-full flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 rounded-xl text-sm font-medium transition-colors"
+              >
+                View Full Checklist
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Quick Actions Grid */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <button
+                onClick={() => openAgentWithPrompt('Generate an NDA template for my company')}
+                className="p-4 bg-slate-900/50 border border-white/10 hover:border-violet-500/50 rounded-xl text-left transition-all group"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 bg-violet-500/20 rounded-lg flex items-center justify-center group-hover:bg-violet-500/30 transition-colors">
+                    <FileText className="w-5 h-5 text-violet-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Generate NDA</h4>
+                    <p className="text-xs text-slate-400">Mutual or one-way</p>
+                  </div>
+                </div>
+                <p className="text-sm text-slate-500">I'll create a customized NDA template ready for signing</p>
+              </button>
+
+              <button
+                onClick={() => openAgentWithPrompt('Generate an IP assignment agreement for a contractor')}
+                className="p-4 bg-slate-900/50 border border-white/10 hover:border-violet-500/50 rounded-xl text-left transition-all group"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center group-hover:bg-amber-500/30 transition-colors">
+                    <Users className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium">IP Assignment</h4>
+                    <p className="text-xs text-slate-400">For contractors</p>
+                  </div>
+                </div>
+                <p className="text-sm text-slate-500">Secure IP rights from freelancers and contractors</p>
+              </button>
+
+              <button
+                onClick={() => openAgentWithPrompt('Help me document an invention for potential patent filing')}
+                className="p-4 bg-slate-900/50 border border-white/10 hover:border-violet-500/50 rounded-xl text-left transition-all group"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center group-hover:bg-emerald-500/30 transition-colors">
+                    <Lightbulb className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Document Invention</h4>
+                    <p className="text-xs text-slate-400">For patents</p>
+                  </div>
+                </div>
+                <p className="text-sm text-slate-500">Create an invention disclosure form</p>
+              </button>
+
+              <button
+                onClick={() => openAgentWithPrompt('Create a trade secret policy for my company')}
+                className="p-4 bg-slate-900/50 border border-white/10 hover:border-violet-500/50 rounded-xl text-left transition-all group"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                    <Lock className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Trade Secret Policy</h4>
+                    <p className="text-xs text-slate-400">Protect secrets</p>
+                  </div>
+                </div>
+                <p className="text-sm text-slate-500">Document what's confidential in your company</p>
+              </button>
+            </div>
+
+            {/* Recent Agent Activity */}
+            {recentActions.length > 0 && (
+              <div className="bg-slate-900/50 border border-white/10 rounded-2xl p-6">
+                <h3 className="font-semibold mb-4 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-violet-400" />
+                  Recent Agent Activity
+                </h3>
+                <div className="space-y-3">
+                  {recentActions.slice(0, 5).map((action) => (
+                    <div key={action.id} className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-xl">
+                      <div className="w-8 h-8 bg-violet-500/20 rounded-lg flex items-center justify-center">
+                        <Zap className="w-4 h-4 text-violet-400" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{action.action_label || action.action_type}</p>
+                        <p className="text-xs text-slate-500">
+                          {new Date(action.created_at).toLocaleDateString()} at {new Date(action.created_at).toLocaleTimeString()}
+                        </p>
+                      </div>
+                      {action.action_type === 'agent_chat' && (
+                        <span className="px-2 py-0.5 text-xs bg-violet-500/20 text-violet-400 rounded-full">AI</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link
-              href="/dashboard/projects/new"
-              className="flex items-center gap-4 p-5 bg-white rounded-xl border border-gray-200 hover:border-violet-200 hover:bg-violet-50/50 transition-colors group"
-            >
-              <div className="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center group-hover:bg-violet-200 transition-colors">
-                <Plus className="w-6 h-6 text-violet-600" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">Add New Project</p>
-                <p className="text-sm text-gray-500">Protect another idea</p>
-              </div>
-            </Link>
-            <Link
-              href="/dashboard/voice"
-              className="flex items-center gap-4 p-5 bg-white rounded-xl border border-gray-200 hover:border-violet-200 hover:bg-violet-50/50 transition-colors group"
-            >
-              <div className="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center group-hover:bg-violet-200 transition-colors">
-                <Mic className="w-6 h-6 text-violet-600" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">Voice Discovery</p>
-                <p className="text-sm text-gray-500">Talk to our AI guide</p>
-              </div>
-            </Link>
-            <Link
-              href="/dashboard/assets"
-              className="flex items-center gap-4 p-5 bg-white rounded-xl border border-gray-200 hover:border-violet-200 hover:bg-violet-50/50 transition-colors group"
-            >
-              <div className="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center group-hover:bg-violet-200 transition-colors">
-                <FileBox className="w-6 h-6 text-violet-600" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">Upload Assets</p>
-                <p className="text-sm text-gray-500">Add logos, designs</p>
-              </div>
-            </Link>
+          {/* Sidebar - Agent Chat */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24">
+              {showChat ? (
+                <ProactiveAgentChat
+                  initialPrompt={chatPrompt}
+                  onClose={() => {
+                    setShowChat(false)
+                    setChatPrompt(undefined)
+                  }}
+                  isExpanded={true}
+                />
+              ) : (
+                <div className="bg-slate-900/50 border border-white/10 rounded-2xl p-6">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <Sparkles className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="font-semibold mb-2">IP Agent Ready!</h3>
+                    <p className="text-sm text-slate-400 mb-4">
+                      I can search trademarks, check domains, generate documents, and guide you through the process.
+                    </p>
+                    <button
+                      onClick={() => setShowChat(true)}
+                      className="w-full py-3 bg-violet-600 hover:bg-violet-500 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      Start Conversation
+                    </button>
+                  </div>
+                  
+                  <div className="mt-6 pt-6 border-t border-white/10">
+                    <p className="text-xs text-slate-500 mb-3 font-medium">QUICK PROMPTS</p>
+                    <div className="space-y-2">
+                      {[
+                        'Check my brand availability',
+                        'Generate an NDA',
+                        'What should I do next?'
+                      ].map((prompt, i) => (
+                        <button
+                          key={i}
+                          onClick={() => openAgentWithPrompt(prompt)}
+                          className="w-full text-left p-2 text-sm text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                        >
+                          → {prompt}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        </>
-      )}
+        </div>
+      </div>
     </div>
   )
 }

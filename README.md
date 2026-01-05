@@ -1,73 +1,205 @@
-# Stripe Integration Files for LaunchReady
+# LaunchReady Proactive IP Agent 🚀
 
-## Files to Copy
+A proactive AI agent that DOES the work, not just links to it. Think of it as an eager intern who comes back with "I already checked that for you!"
 
-Copy these files to your project:
+## What Makes It Proactive?
+
+### ❌ Traditional Chatbot
+```
+User: "I need to check if my company name is available"
+Bot: "Here are some links to check trademarks: [USPTO] [IP Australia]..."
+```
+
+### ✅ Proactive Agent
+```
+User: "My company is called Acme"
+Agent: "I already ran the checks! Here's what I found:
+
+🔍 TRADEMARK SEARCH
+✅ "Acme" has LOW RISK - no exact matches in your category
+
+🌐 DOMAIN AVAILABILITY  
+✅ acme.io - Available! [Register Now]
+❌ acme.com - Taken
+✅ getacme.com - Available! [Register Now]
+
+📱 SOCIAL HANDLES
+✅ @acme available on: Twitter, TikTok, GitHub
+❌ Taken on: Instagram, LinkedIn
+
+📝 I also drafted an IP assignment template for any contractors.
+Want me to check anything else?"
+```
+
+## Features
+
+### 1. Automatic Research
+When user mentions company/product name:
+- Searches trademark databases
+- Checks domain availability across TLDs
+- Scans social media handle availability
+- Reports everything together
+
+### 2. Document Generation
+Agent creates real, usable documents:
+- IP Assignment Agreements
+- NDA Templates (mutual & one-way)
+- Trade Secret Policies
+- Invention Disclosure Forms
+
+### 3. Progress Tracking
+- Saves to Supabase automatically
+- Shows what's done, in-progress, and critical
+- Agent knows context and suggests next steps
+
+### 4. Proactive Personality
+System prompt instructs Claude to:
+- Take action without being asked
+- Come back with results, not just links
+- Suggest and offer next steps
+- Be enthusiastic but not annoying
+
+## Files Structure
 
 ```
-components/UpgradeButton.tsx     → components/UpgradeButton.tsx
-app/page.tsx                     → app/page.tsx (landing page)
-app/signup/page.tsx              → app/signup/page.tsx
-app/auth/callback/page.tsx       → app/auth/callback/page.tsx
+app/
+├── api/
+│   └── agent/
+│       └── chat/
+│           └── route.ts      # Main agent API with tools
+├── dashboard/
+│   └── page.tsx              # Smart dashboard with agent
+├── onboarding/
+│   └── page.tsx              # Proactive onboarding flow
+└── checklist/
+    └── page.tsx              # IP checklist (from previous)
+
+components/
+└── ProactiveAgentChat.tsx    # Reusable agent chat component
+
+lib/
+└── agent-tools.ts            # Tool definitions & executors
+
+supabase/
+└── migrations/
+    ├── create_ip_checklist_tables.sql
+    └── add_company_info.sql
 ```
 
-## Environment Variables
+## Setup
 
-Add these to Vercel (Settings → Environment Variables):
+### 1. Environment Variables
 
-| Variable | Description |
-|----------|-------------|
-| `STRIPE_SECRET_KEY` | From Stripe Dashboard → API Keys |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | From Stripe Dashboard → API Keys |
-| `NEXT_PUBLIC_STRIPE_PRO_PRICE_ID` | From Stripe → Products → Your Pro product → Price ID |
-| `STRIPE_WEBHOOK_SECRET` | From Stripe → Webhooks → Your endpoint → Signing secret |
-| `NEXT_PUBLIC_APP_URL` | `https://launchready-ruby.vercel.app` |
+```bash
+# .env.local
+ANTHROPIC_API_KEY=sk-ant-xxx
+NEXT_PUBLIC_SUPABASE_URL=xxx
+NEXT_PUBLIC_SUPABASE_ANON_KEY=xxx
+```
 
-## Stripe Setup
+### 2. Run Migrations
 
-### 1. Create Product & Price
+In Supabase SQL Editor, run:
+- `create_ip_checklist_tables.sql`
+- `add_company_info.sql`
 
-1. Go to [Stripe Dashboard → Products](https://dashboard.stripe.com/products)
-2. Click **Add product**
-3. Name: `LaunchReady Pro`
-4. Price: `$30.00 USD` / month (recurring)
-5. Save and copy the **Price ID** (starts with `price_`)
+### 3. Install Dependencies
 
-### 2. Set Up Webhook
+```bash
+npm install @anthropic-ai/sdk
+```
 
-1. Go to [Stripe → Webhooks](https://dashboard.stripe.com/webhooks)
-2. Click **Add endpoint**
-3. URL: `https://launchready-ruby.vercel.app/api/stripe/webhook`
-4. Select events:
-   - `checkout.session.completed`
-   - `customer.subscription.updated`
-   - `customer.subscription.deleted`
-   - `invoice.payment_failed`
-5. Copy the **Signing secret** (`whsec_...`)
+### 4. Deploy
 
-## How It Works
+```bash
+git add .
+git commit -m "Add proactive IP agent"
+git push
+```
 
-1. **Landing Page**: Pro "Upgrade" button calls `/api/stripe/checkout`
-   - If logged in → Redirects to Stripe Checkout
-   - If not logged in → Redirects to `/signup?plan=pro`
+## How the Agent Works
 
-2. **Signup Page**: Detects `?plan=pro` in URL
-   - Shows "Pro Plan Selected" badge
-   - After signup → Redirects to Stripe Checkout
+### Tools Available
 
-3. **Auth Callback**: After email confirmation
-   - If `?plan=pro` → Redirects to Stripe Checkout
-   - Otherwise → Redirects to Dashboard
+| Tool | What It Does |
+|------|-------------|
+| `check_domain_availability` | Checks DNS for domain availability across TLDs |
+| `check_social_handles` | Checks if handles are taken on major platforms |
+| `search_trademarks` | Searches USPTO for conflicts |
+| `generate_ip_assignment` | Creates contractor IP agreement |
+| `generate_nda` | Creates mutual or one-way NDA |
+| `generate_trade_secret_policy` | Creates confidentiality policy |
+| `generate_invention_disclosure` | Creates patent documentation form |
+| `save_checklist_progress` | Updates user's progress in DB |
 
-4. **Webhook**: Handles subscription events
-   - `checkout.session.completed` → Sets user plan to 'pro'
-   - `customer.subscription.deleted` → Sets user plan to 'free'
+### Tool Loop
 
-## Test Mode
+```
+User Message
+    ↓
+Claude analyzes and decides to use tools
+    ↓
+Execute tools (domain check, trademark search, etc.)
+    ↓
+Return results to Claude
+    ↓
+Claude synthesizes and responds with actions taken
+    ↓
+Offer next steps proactively
+```
 
-Use Stripe test mode first:
-- Test card: `4242 4242 4242 4242`
-- Any future expiry date
-- Any CVC
+## Personality Guidelines
 
-Switch to live mode when ready to accept real payments.
+The agent is instructed to:
+
+1. **Be Proactive** - Don't wait to be asked
+2. **Do the Work** - Use tools, don't just link
+3. **Report Completely** - Give full results
+4. **Suggest Next Steps** - Always offer to continue
+5. **Be Enthusiastic** - Celebrate wins, encourage progress
+6. **Know Limits** - Recommend attorneys for legal advice
+
+## Extending
+
+### Add New Tool
+
+1. Add function to `lib/agent-tools.ts`
+2. Add tool definition to `agentTools` array
+3. Add case to `executeAgentTool` switch
+
+Example:
+```typescript
+// In agent-tools.ts
+
+export async function myNewTool(params: { ... }) {
+  // Do something useful
+  return results
+}
+
+// Add to agentTools array
+{
+  name: 'my_new_tool',
+  description: 'Does something useful',
+  input_schema: { ... }
+}
+
+// Add to executeAgentTool
+case 'my_new_tool': {
+  const result = await myNewTool(toolInput as MyParams)
+  return formatResult(result)
+}
+```
+
+## API Integrations to Add
+
+For production, consider adding real API integrations:
+
+- **Trademark**: USPTO API, TrademarkNow, Corsearch
+- **Domains**: GoDaddy API, Namecheap API, Cloudflare
+- **Social**: Buffer API for account creation
+- **Documents**: DocuSign for e-signatures
+- **Legal**: Connect to Clerky, Stripe Atlas, or law firm APIs
+
+## License
+
+MIT - Build something great! 🚀
