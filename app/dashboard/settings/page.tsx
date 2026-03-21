@@ -148,8 +148,8 @@ export default function SettingsPage() {
         {/* Subscription Section */}
         <div className="bg-white rounded-2xl border border-gray-200 p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-emerald-100 rounded-lg">
-              <CreditCard className="w-5 h-5 text-emerald-600" />
+            <div className="p-2 bg-[#22c55e]/10 rounded-lg">
+              <CreditCard className="w-5 h-5 text-[#22c55e]" />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-gray-900">Subscription</h2>
@@ -167,7 +167,7 @@ export default function SettingsPage() {
               </p>
             </div>
             <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-              profile?.plan === 'pro' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-700'
+              profile?.plan === 'pro' ? 'bg-[#22c55e]/10 text-[#16a34a]' : 'bg-gray-200 text-gray-700'
             }`}>
               {profile?.plan === 'pro' ? 'Pro' : 'Free'}
             </span>

@@ -6,8 +6,8 @@ import Link from 'next/link'
 import { Shield, Globe, FileText, Code, Lightbulb, Tag, Plus, Search, Loader2, Check, Clock, AlertTriangle, ChevronRight } from 'lucide-react'
 
 const typeIcons: Record<string, any> = { trademark: Tag, patent: Lightbulb, copyright: FileText, trade_secret: Shield, domain: Globe, code: Code }
-const typeColors: Record<string, string> = { trademark: 'bg-purple-100 text-purple-600', patent: 'bg-amber-100 text-amber-600', copyright: 'bg-blue-100 text-blue-600', trade_secret: 'bg-emerald-100 text-emerald-600', domain: 'bg-indigo-100 text-indigo-600', code: 'bg-gray-100 text-gray-600' }
-const statusColors: Record<string, string> = { registered: 'bg-emerald-100 text-emerald-700', pending: 'bg-amber-100 text-amber-700', filed: 'bg-blue-100 text-blue-700', at_risk: 'bg-red-100 text-red-700', protected: 'bg-emerald-100 text-emerald-700' }
+const typeColors: Record<string, string> = { trademark: 'bg-purple-100 text-purple-600', patent: 'bg-amber-100 text-amber-600', copyright: 'bg-blue-100 text-blue-600', trade_secret: 'bg-[#22c55e]/10 text-[#22c55e]', domain: 'bg-indigo-100 text-indigo-600', code: 'bg-gray-100 text-gray-600' }
+const statusColors: Record<string, string> = { registered: 'bg-[#22c55e]/10 text-[#16a34a]', pending: 'bg-amber-100 text-amber-700', filed: 'bg-blue-100 text-blue-700', at_risk: 'bg-red-100 text-red-700', protected: 'bg-[#22c55e]/10 text-[#16a34a]' }
 
 export default function AssetsPage() {
   const supabase = createClientComponentClient()
@@ -60,7 +60,7 @@ export default function AssetsPage() {
           <div><p className="text-2xl font-bold">{stats.total}</p><p className="text-sm text-gray-500">Total Assets</p></div>
         </div>
         <div className="bg-white rounded-xl border p-4 flex items-center gap-3">
-          <div className="p-2 bg-emerald-100 rounded-lg"><Check className="w-5 h-5 text-emerald-600" /></div>
+          <div className="p-2 bg-[#22c55e]/10 rounded-lg"><Check className="w-5 h-5 text-[#22c55e]" /></div>
           <div><p className="text-2xl font-bold">{stats.protected}</p><p className="text-sm text-gray-500">Protected</p></div>
         </div>
         <div className="bg-white rounded-xl border p-4 flex items-center gap-3">

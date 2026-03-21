@@ -234,9 +234,9 @@ export default function SmartDashboard() {
               </div>
 
               <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-3 bg-emerald-500/10 rounded-xl">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto mb-1" />
-                  <p className="text-2xl font-bold text-emerald-400">{completedItems}</p>
+                <div className="text-center p-3 bg-[#22c55e]/10 rounded-xl">
+                  <CheckCircle2 className="w-6 h-6 text-[#22c55e] mx-auto mb-1" />
+                  <p className="text-2xl font-bold text-[#22c55e]">{completedItems}</p>
                   <p className="text-xs text-slate-400">Complete</p>
                 </div>
                 <div className="text-center p-3 bg-amber-500/10 rounded-xl">
@@ -299,8 +299,8 @@ export default function SmartDashboard() {
                 className="p-4 bg-slate-900/50 border border-white/10 hover:border-violet-500/50 rounded-xl text-left transition-all group"
               >
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center group-hover:bg-emerald-500/30 transition-colors">
-                    <Lightbulb className="w-5 h-5 text-emerald-400" />
+                  <div className="w-10 h-10 bg-[#22c55e]/20 rounded-lg flex items-center justify-center group-hover:bg-[#22c55e]/30 transition-colors">
+                    <Lightbulb className="w-5 h-5 text-[#22c55e]" />
                   </div>
                   <div>
                     <h4 className="font-medium">Document Invention</h4>

@@ -76,15 +76,15 @@ const STATUS_CONFIG: Record<string, {
   },
   protected: { 
     icon: CheckCircle2, 
-    color: 'text-emerald-500', 
-    bgColor: 'bg-emerald-100 text-emerald-700 border-emerald-200', 
+    color: 'text-[#22c55e]', 
+    bgColor: 'bg-[#22c55e]/10 text-[#16a34a] border-[#22c55e]/20', 
     label: 'Protected',
     priority: 5,
   },
   registered: { 
     icon: CheckCircle2, 
-    color: 'text-emerald-500', 
-    bgColor: 'bg-emerald-100 text-emerald-700 border-emerald-200', 
+    color: 'text-[#22c55e]', 
+    bgColor: 'bg-[#22c55e]/10 text-[#16a34a] border-[#22c55e]/20', 
     label: 'Registered',
     priority: 5,
   },
@@ -161,7 +161,7 @@ export default async function ProjectPage({ params }: { params: { id: string } }
     idea: 'bg-gray-100 text-gray-700',
     building: 'bg-blue-100 text-blue-700',
     mvp: 'bg-violet-100 text-violet-700',
-    launched: 'bg-emerald-100 text-emerald-700',
+    launched: 'bg-[#22c55e]/10 text-[#16a34a]',
   }
 
   // Helper to find existing item status
@@ -209,7 +209,7 @@ export default async function ProjectPage({ params }: { params: { id: string } }
           {/* Health Score */}
           <div className="text-right">
             <div className={`text-3xl font-bold ${
-              healthScore >= 70 ? 'text-emerald-600' :
+              healthScore >= 70 ? 'text-[#22c55e]' :
               healthScore >= 40 ? 'text-amber-600' : 'text-red-600'
             }`}>
               {healthScore}%
@@ -242,12 +242,12 @@ export default async function ProjectPage({ params }: { params: { id: string } }
           </div>
           <p className="text-2xl font-bold text-amber-500">{stats.pending}</p>
         </div>
-        <div className="bg-white rounded-xl border-2 border-emerald-200 p-4">
+        <div className="bg-white rounded-xl border-2 border-[#22c55e]/20 p-4">
           <div className="flex items-center gap-2 mb-1">
-            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+            <CheckCircle2 className="w-4 h-4 text-[#22c55e]" />
             <span className="text-sm text-gray-500">Protected</span>
           </div>
-          <p className="text-2xl font-bold text-emerald-500">{stats.protected}</p>
+          <p className="text-2xl font-bold text-[#22c55e]">{stats.protected}</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <div className="flex items-center gap-2 mb-1">
@@ -396,7 +396,7 @@ export default async function ProjectPage({ params }: { params: { id: string } }
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                <CheckCircle2 className="w-4 h-4 text-[#22c55e]" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">Protected</p>
                   <p className="text-xs text-gray-500">Completed and secure</p>

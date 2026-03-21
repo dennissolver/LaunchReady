@@ -21,7 +21,7 @@ export default async function ProjectsPage() {
     idea: 'bg-gray-100 text-gray-700',
     building: 'bg-blue-100 text-blue-700',
     mvp: 'bg-violet-100 text-violet-700',
-    launched: 'bg-emerald-100 text-emerald-700',
+    launched: 'bg-[#22c55e]/10 text-[#16a34a]',
   }
 
   return (

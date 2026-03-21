@@ -226,7 +226,7 @@ export default function PricingPage() {
                     <li key={i} className="flex items-start gap-3">
                       {feature.included ? (
                         <Check className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
-                          feature.highlight ? 'text-emerald-400' : 'text-emerald-500'
+                          feature.highlight ? 'text-[#22c55e]' : 'text-[#22c55e]'
                         }`} />
                       ) : (
                         <X className="w-5 h-5 mt-0.5 flex-shrink-0 text-gray-600" />
@@ -311,7 +311,7 @@ export default function PricingPage() {
               >
                 <div className="font-medium text-gray-300">{row.aspect}</div>
                 <div className="text-center text-gray-400 text-sm">{row.free}</div>
-                <div className="text-center text-emerald-400 text-sm">{row.pro}</div>
+                <div className="text-center text-[#22c55e] text-sm">{row.pro}</div>
               </div>
             ))}
           </div>

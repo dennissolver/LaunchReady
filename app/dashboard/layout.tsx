@@ -2,6 +2,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { DashboardNav } from '@/components/dashboard/DashboardNav'
+import { CorporateFooter } from '@/components/corporate/CorporateFooter'
 
 export default async function DashboardLayout({
   children,
@@ -44,12 +45,13 @@ export default async function DashboardLayout({
             <p className="text-xs text-slate-500 flex items-center gap-2">
               <span className="w-4 h-4 rounded-full border border-slate-400 flex items-center justify-center text-[10px] font-bold flex-shrink-0">i</span>
               <span>
-                <strong className="text-slate-600">Not legal advice.</strong> LaunchReady provides educational guidance and IP tracking tools only. 
+                <strong className="text-slate-600">Not legal advice.</strong> LaunchReady provides educational guidance and IP tracking tools only.
                 For legal advice, filings, and contracts, we connect you with our specialist legal partners.
               </span>
             </p>
           </div>
         </div>
+        <CorporateFooter productName="LaunchReady" theme="light" />
       </main>
     </div>
   )

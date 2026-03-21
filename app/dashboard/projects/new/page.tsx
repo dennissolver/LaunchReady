@@ -289,7 +289,7 @@ export default function NewProjectPage() {
                         </button>
                         <button
                           onClick={handleApproveDescription}
-                          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium"
+                          className="flex items-center gap-2 px-4 py-2 bg-[#22c55e] hover:bg-[#22c55e] text-white rounded-lg text-sm font-medium"
                         >
                           <Check className="w-4 h-4" />
                           Approve & Continue
@@ -393,11 +393,11 @@ export default function NewProjectPage() {
             </p>
 
             {domain && (
-              <div className="bg-emerald-50 rounded-xl p-4 mb-4 flex items-center gap-3 text-left">
-                <Globe className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+              <div className="bg-[#22c55e]/5 rounded-xl p-4 mb-4 flex items-center gap-3 text-left">
+                <Globe className="w-5 h-5 text-[#22c55e] flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-emerald-900">Domain will be added</p>
-                  <p className="text-sm text-emerald-700">{domain.replace(/^https?:\/\//, '').split('/')[0]}</p>
+                  <p className="font-medium text-[#14532d]">Domain will be added</p>
+                  <p className="text-sm text-[#16a34a]">{domain.replace(/^https?:\/\//, '').split('/')[0]}</p>
                 </div>
               </div>
             )}

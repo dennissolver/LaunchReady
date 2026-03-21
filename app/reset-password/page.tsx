@@ -104,10 +104,10 @@ export default function ResetPasswordConfirm() {
                   <div className="grid grid-cols-2 gap-2">
                     {passwordRequirements.map((req, index) => (
                       <div key={index} className="flex items-center gap-2">
-                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${req.met ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700/50 text-slate-500'}`}>
+                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${req.met ? 'bg-[#22c55e]/20 text-[#22c55e]' : 'bg-slate-700/50 text-slate-500'}`}>
                           {req.met && <CheckCircle2 className="w-3 h-3" />}
                         </div>
-                        <span className={`text-xs ${req.met ? 'text-emerald-400' : 'text-slate-500'}`}>
+                        <span className={`text-xs ${req.met ? 'text-[#22c55e]' : 'text-slate-500'}`}>
                           {req.label}
                         </span>
                       </div>
@@ -129,7 +129,7 @@ export default function ResetPasswordConfirm() {
                       className={`w-full px-5 py-4 pr-12 text-base text-white bg-slate-800/50 border rounded-lg outline-none transition-all duration-300 placeholder:text-slate-500 focus:bg-slate-800/80 focus:ring-2 ${
                         confirmPassword.length > 0
                           ? passwordsMatch
-                            ? 'border-emerald-500/50 focus:border-emerald-500/50 focus:ring-emerald-500/20'
+                            ? 'border-[#22c55e]/50 focus:border-[#22c55e]/50 focus:ring-[#22c55e]/20'
                             : 'border-red-500/50 focus:border-red-500/50 focus:ring-red-500/20'
                           : 'border-slate-700/50 focus:border-violet-500/50 focus:ring-violet-500/20'
                       }`}
@@ -173,8 +173,8 @@ export default function ResetPasswordConfirm() {
             </>
           ) : (
             <div className="text-center">
-              <div className="w-20 h-20 mx-auto mb-8 bg-gradient-to-br from-emerald-500/20 to-green-500/10 rounded-full flex items-center justify-center border border-emerald-500/20">
-                <ShieldCheck className="w-9 h-9 text-emerald-400" />
+              <div className="w-20 h-20 mx-auto mb-8 bg-gradient-to-br from-[#22c55e]/20 to-green-500/10 rounded-full flex items-center justify-center border border-[#22c55e]/20">
+                <ShieldCheck className="w-9 h-9 text-[#22c55e]" />
               </div>
 
               <h2 className="text-2xl font-semibold text-white mb-4 tracking-tight">

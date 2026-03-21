@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { 
-  Shield, AlertTriangle, Clock, CheckCircle2, ArrowRight, 
+import {
+  Shield, AlertTriangle, Clock, CheckCircle2, ArrowRight,
   Zap, Lock, FileCheck, Mic, Github, Globe, Database,
   ChevronDown, X, Sparkles, TrendingUp, Play, Server, Users, Check
 } from 'lucide-react'
 import { UpgradeButton } from '@/components/UpgradeButton'
+import { CorporateHeader } from '@/components/corporate/CorporateHeader'
+import { CorporateFooter } from '@/components/corporate/CorporateFooter'
 
 // Scroll Progress Hook
 function useScrollProgress() {
@@ -174,34 +176,22 @@ export default function LandingPage() {
       </div>
 
       {/* Navigation */}
-      <nav className="fixed top-1 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-lg border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                <Shield className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold">LaunchReady</span>
-            </div>
-            <div className="hidden md:flex items-center gap-8">
-              <a href="#problem" className="text-sm text-gray-400 hover:text-white transition-colors">The Problem</a>
-              <a href="#features" className="text-sm text-gray-400 hover:text-white transition-colors">Features</a>
-              <a href="#pricing" className="text-sm text-gray-400 hover:text-white transition-colors">Pricing</a>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link href="/login" className="text-sm text-gray-400 hover:text-white transition-colors">
-                Sign In
-              </Link>
-              <Link
-                href="/signup"
-                className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors"
-              >
-                Get Started
-              </Link>
-            </div>
+      <CorporateHeader
+        productName="LaunchReady"
+        productAcronym="LR"
+        navItems={[
+          { href: '#problem', label: 'The Problem' },
+          { href: '#features', label: 'Features' },
+          { href: '#pricing', label: 'Pricing' },
+        ]}
+        theme="dark"
+        rightContent={
+          <div className="flex items-center gap-4">
+            <Link href="/login" className="text-sm text-gray-400 hover:text-white transition-colors">Sign In</Link>
+            <Link href="/signup" className="px-4 py-2 bg-[#22c55e] hover:bg-[#4ade80] rounded-lg text-sm font-medium transition-colors text-white">Get Started</Link>
           </div>
-        </div>
-      </nav>
+        }
+      />
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 relative overflow-hidden">
@@ -374,7 +364,7 @@ export default function LandingPage() {
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature, i) => (
                     <li key={i} className="flex items-center gap-3">
-                      <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                      <Check className="w-5 h-5 text-[#22c55e] flex-shrink-0" />
                       <span className="text-gray-300">{feature}</span>
                     </li>
                   ))}
@@ -451,7 +441,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-300 text-sm mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#22c55e]/10 border border-[#22c55e]/20 rounded-full text-[#4ade80] text-sm mb-6">
                 <TrendingUp className="w-4 h-4" />
                 <span>Increase Your Valuation</span>
               </div>
@@ -464,8 +454,8 @@ export default function LandingPage() {
               </p>
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  <div className="w-10 h-10 bg-[#22c55e]/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="w-5 h-5 text-[#22c55e]" />
                   </div>
                   <div>
                     <p className="font-semibold text-white">Reduce Investor Risk</p>
@@ -473,8 +463,8 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  <div className="w-10 h-10 bg-[#22c55e]/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="w-5 h-5 text-[#22c55e]" />
                   </div>
                   <div>
                     <p className="font-semibold text-white">Faster Due Diligence</p>
@@ -482,8 +472,8 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  <div className="w-10 h-10 bg-[#22c55e]/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="w-5 h-5 text-[#22c55e]" />
                   </div>
                   <div>
                     <p className="font-semibold text-white">Higher Valuations</p>
@@ -510,9 +500,9 @@ export default function LandingPage() {
                   <span className="text-gray-300">Expired patent window</span>
                   <span className="text-red-400 font-medium">Lost opportunity</span>
                 </div>
-                <div className="flex items-center justify-between p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
-                  <span className="text-emerald-300">Complete IP portfolio</span>
-                  <span className="text-emerald-400 font-medium">Investor ready ✓</span>
+                <div className="flex items-center justify-between p-4 bg-[#22c55e]/10 rounded-xl border border-[#22c55e]/20">
+                  <span className="text-[#4ade80]">Complete IP portfolio</span>
+                  <span className="text-[#22c55e] font-medium">Investor ready ✓</span>
                 </div>
               </div>
             </div>
@@ -552,43 +542,21 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Legal Disclaimer */}
+      <div className="border-t border-b border-white/10 bg-slate-900/50">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <p className="text-xs text-gray-500 text-center flex items-center justify-center gap-2">
+            <span className="w-4 h-4 rounded-full border border-gray-600 flex items-center justify-center text-[10px] font-bold">i</span>
+            <span>
+              <strong className="text-gray-400">Not legal advice.</strong> LaunchReady provides educational guidance and IP tracking tools only.
+              For legal advice, filings, and contracts, we connect you with our specialist legal partners.
+            </span>
+          </p>
+        </div>
+      </div>
+
       {/* Footer */}
-      <footer className="border-t border-white/10">
-        {/* Legal Disclaimer */}
-        <div className="border-b border-white/10 bg-slate-900/50">
-          <div className="max-w-7xl mx-auto px-4 py-4">
-            <p className="text-xs text-gray-500 text-center flex items-center justify-center gap-2">
-              <span className="w-4 h-4 rounded-full border border-gray-600 flex items-center justify-center text-[10px] font-bold">i</span>
-              <span>
-                <strong className="text-gray-400">Not legal advice.</strong> LaunchReady provides educational guidance and IP tracking tools only. 
-                For legal advice, filings, and contracts, we connect you with our specialist legal partners.
-              </span>
-            </p>
-          </div>
-        </div>
-        
-        <div className="py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                  <Shield className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-lg font-bold">LaunchReady</span>
-              </div>
-              <div className="flex items-center gap-6 text-sm text-gray-500">
-                <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
-                <a href="#" className="hover:text-white transition-colors">Privacy</a>
-                <a href="#" className="hover:text-white transition-colors">Terms</a>
-                <a href="mailto:hello@launchready.io" className="hover:text-white transition-colors">Contact</a>
-              </div>
-              <p className="text-sm text-gray-500">
-                © 2026 LaunchReady. All rights reserved.
-              </p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <CorporateFooter productName="LaunchReady" theme="dark" />
     </div>
   )
 }

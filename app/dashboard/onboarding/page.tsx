@@ -380,8 +380,8 @@ export default function OnboardingPage() {
           {step === 4 && (
             <>
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                  <Shield className="w-5 h-5 text-emerald-600" />
+                <div className="w-10 h-10 bg-[#22c55e]/10 rounded-lg flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-[#22c55e]" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-gray-900">Almost done!</h2>
@@ -479,7 +479,7 @@ export default function OnboardingPage() {
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-300 text-white rounded-xl font-medium transition-colors"
+                className="flex items-center gap-2 px-6 py-3 bg-[#22c55e] hover:bg-[#22c55e] disabled:bg-gray-300 text-white rounded-xl font-medium transition-colors"
               >
                 {loading ? (
                   <>

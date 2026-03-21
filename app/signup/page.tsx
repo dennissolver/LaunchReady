@@ -144,7 +144,7 @@ function SignupForm() {
           )}
 
           {message && (
-            <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400 text-sm">
+            <div className="mb-6 p-4 bg-[#22c55e]/10 border border-[#22c55e]/20 rounded-lg text-[#22c55e] text-sm">
               {message}
             </div>
           )}
